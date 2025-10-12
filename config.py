@@ -42,18 +42,30 @@ COLLECTION_NAME = "sarjak_portfolio"
 # LLM provider settings
 # Options: "openai" or "ollama"
 # -----------------------------------------------------------------------------
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
+# LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")
 
-# OpenAI
+# OpenAI (kept for easy switching)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# fast & cost-effective
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-OPENAI_TEMPERATURE = float(
-    os.getenv("OPENAI_TEMPERATURE", "0.3"))  # lower for factual RAG
+OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.3"))
 
-# Ollama (optional local)
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
-OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.3"))
+# Ollama (FREE local)
+# Suggested models:
+
+# little heavy and will take more time
+# -> llama3.1:8b-instruct-q4_0
+
+# good quality/speed balance
+# -> ollama pull llama3.2:3b-instruct-q4_0
+
+# also fast + very capable on RAG (often better than 3B llama)
+# -> ollama pull qwen2.5:3b-instruct-q4_0
+
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct-q4_0")
+OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.2"))
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))   # context window
 
 # -----------------------------------------------------------------------------
 # Embeddings

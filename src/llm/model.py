@@ -3,7 +3,7 @@ Multi-provider LLM interface - OpenAI or Ollama
 """
 from typing import Optional, cast
 from langchain_openai import ChatOpenAI
-from langchain_ollama import OllamaLLM
+from langchain_ollama.llms import OllamaLLM
 from langchain.prompts import PromptTemplate
 from src.utils.logger import logger
 import config
@@ -31,9 +31,7 @@ class LLMInterface:
             raise ValueError(f"Unknown LLM provider: {self.provider}")
 
     def _init_openai(self):
-        """Initialize OpenAI LLM"""
         api_key: str = config.OPENAI_API_KEY or ""  # Default to empty string
-
         if not api_key:
             raise ValueError(
                 "OPENAI_API_KEY not found in environment variables")
@@ -41,20 +39,23 @@ class LLMInterface:
         self.llm = ChatOpenAI(
             model=config.OPENAI_MODEL,
             temperature=config.OPENAI_TEMPERATURE,
-            # Now it's definitely a str, not None # pyright: ignore[reportArgumentType]
             api_key=api_key  # type: ignore[arg-type]
         )
         self.model_name = config.OPENAI_MODEL
         logger.info(f"✅ OpenAI LLM initialized: {self.model_name}")
 
     def _init_ollama(self):
-        """Initialize Ollama LLM"""
         self.llm = OllamaLLM(
             model=config.OLLAMA_MODEL,
-            temperature=config.OLLAMA_TEMPERATURE
+            temperature=config.OLLAMA_TEMPERATURE,
+            base_url=config.OLLAMA_BASE_URL,
+            num_ctx=config.OLLAMA_NUM_CTX,
+            # you can add other options here if you like:
+            # mirostat=0, top_p=0.9, repeat_penalty=1.1, etc.
         )
         self.model_name = config.OLLAMA_MODEL
-        logger.info(f"✅ Ollama LLM initialized: {self.model_name}")
+        logger.info(
+            f"✅ Ollama LLM initialized: {self.model_name} @ {config.OLLAMA_BASE_URL}")
 
     def generate(self, prompt: str) -> str:
         """
