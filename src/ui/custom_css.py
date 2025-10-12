@@ -139,8 +139,8 @@ button.nav-item:active {
 /* ===== BUTTONS ===== */
 .toggle-btn, .clear-btn {
     position: fixed !important;
-    width: 36px !important;
-    height: 36px !important;
+    width: 40px !important;
+    height: 40px !important;
     background: var(--bg-secondary) !important;
     border: 1px solid var(--border-subtle) !important;
     border-radius: 8px !important;
@@ -156,17 +156,17 @@ button.nav-item:active {
 }
 
 .toggle-btn {
-    top: 12px !important;
-    left: 268px !important;
+    top: 20px !important;
+    left: 276px !important;
 }
 
 .toggle-btn.sidebar-closed {
-    left: 12px !important;
+    left: 20px !important;
 }
 
 .clear-btn {
-    top: 12px !important;
-    right: 16px !important;
+    top: 20px !important;
+    right: 20px !important;
 }
 
 .toggle-btn:hover, .clear-btn:hover {
@@ -183,9 +183,10 @@ button.nav-item:active {
 .main-content {
     margin-left: 260px !important;
     transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    min-height: 100vh !important;
+    height: 100vh !important;
     display: flex !important;
     flex-direction: column !important;
+    overflow: hidden !important;
 }
 
 .main-content.sidebar-closed {
@@ -195,6 +196,9 @@ button.nav-item:active {
 /* ===== WELCOME SCREEN ===== */
 .main-content > div:first-of-type {
     animation: fadeIn 0.5s ease-out !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding-top: 80px !important;
 }
 
 /* ===== CHATBOT ===== */
@@ -202,6 +206,9 @@ button.nav-item:active {
     background: var(--bg-main) !important;
     border: none !important;
     flex: 1 !important;
+    overflow-y: auto !important;
+    padding-top: 80px !important;
+    padding-bottom: 0px !important;
 }
 
 .chatbot-wrapper .message {
@@ -214,6 +221,15 @@ button.nav-item:active {
 /* Message hover effect */
 .chatbot-wrapper .message:hover {
     background: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Hide Gradio's built-in buttons */
+.chatbot-wrapper button,
+.chatbot-wrapper .copy-button,
+.chatbot-wrapper .delete-button,
+.chatbot-wrapper [title="Delete"],
+.chatbot-wrapper [title="Copy"] {
+    display: none !important;
 }
 
 /* ===== TYPING INDICATOR ===== */
@@ -244,8 +260,10 @@ button.nav-item:active {
     padding: 20px 24px 24px 24px !important;
     background: var(--bg-main) !important;
     border-top: 1px solid var(--border-subtle) !important;
-    margin-top: auto !important;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
 }
 
 .input-area textarea {
