@@ -1,5 +1,5 @@
 """
-Sarjak's AI/ML Portfolio - FINAL WORKING VERSION
+Sarjak's AI/ML Portfolio - ACTUALLY WORKING VERSION
 """
 import gradio as gr
 from typing import List
@@ -14,64 +14,13 @@ conversation_manager = ConversationManager()
 logger.info("✅ Ready!")
 
 
-def welcome_html() -> str:
-    """Clean welcome screen"""
-    return """
-    <div style="max-width: 700px;">
-        <h1 style="font-size: 48px; font-weight: 600; margin-bottom: 16px;">
-            Hi, I'm Sarjak! 👋
-        </h1>
-        <p style="font-size: 20px; color: #c5c5d2; margin-bottom: 48px;">
-            Data Scientist | AI & ML Engineer
-        </p>
-        <p style="font-size: 16px; color: #8e8ea0; line-height: 1.8; margin-bottom: 40px;">
-            Welcome to my interactive AI portfolio! I'm passionate about building intelligent systems 
-            that solve real-world problems. Feel free to ask me anything about my experience, projects, 
-            or technical skills.
-        </p>
-        <div style="padding: 24px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-            <p style="font-size: 14px; color: #8e8ea0; font-style: italic; margin: 0;">
-                "Develop a passion for learning. If you do, you will never cease to grow."<br>
-                <span style="color: #c5c5d2; font-weight: 500; margin-top: 8px; display: inline-block;">
-                    - Anthony J. D'Angelo
-                </span>
-            </p>
-        </div>
-    </div>
-    """
-
-
-def format_user_message(content: str) -> str:
-    """Format user message - RIGHT ALIGNED"""
-    return f"""
-    <div class="chat-message user-message">
-        <div class="message-bubble">
-            <div class="message-text">{content}</div>
-            <div class="message-avatar user-avatar">👤</div>
-        </div>
-    </div>
-    """
-
-
-def format_bot_message(content: str) -> str:
-    """Format bot message - LEFT ALIGNED"""
-    return f"""
-    <div class="chat-message bot-message">
-        <div class="message-bubble">
-            <div class="message-avatar bot-avatar">🤖</div>
-            <div class="message-text">{content}</div>
-        </div>
-    </div>
-    """
-
-
 def create_app():
     """Create Gradio app"""
 
     with gr.Blocks(css=get_custom_css(), title=config.APP_TITLE) as app:
 
         # State
-        chat_started = gr.State(False)
+        chat_history = gr.State([])
         sidebar_open = gr.State(True)
 
         with gr.Row():
@@ -113,67 +62,93 @@ def create_app():
                 toggle_btn = gr.Button("☰", elem_classes="toggle-btn")
                 clear_btn = gr.Button("🗑️", elem_classes="clear-btn")
 
-                # Welcome
-                welcome = gr.HTML(welcome_html(), visible=True,
-                                  elem_classes="welcome-screen")
+                # Welcome screen
+                welcome = gr.HTML("""
+                    <div style="display: flex; align-items: center; justify-content: center; height: 60vh; padding: 40px;">
+                        <div style="max-width: 700px; text-align: center;">
+                            <h1 style="font-size: 48px; font-weight: 600; margin-bottom: 16px;">
+                                Hi, I'm Sarjak! 👋
+                            </h1>
+                            <p style="font-size: 20px; color: #c5c5d2; margin-bottom: 48px;">
+                                Data Scientist | AI & ML Engineer
+                            </p>
+                            <p style="font-size: 16px; color: #8e8ea0; line-height: 1.8; margin-bottom: 40px;">
+                                Welcome to my interactive AI portfolio! I'm passionate about building intelligent systems 
+                                that solve real-world problems. Feel free to ask me anything about my experience, projects, 
+                                or technical skills.
+                            </p>
+                            <div style="padding: 24px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <p style="font-size: 14px; color: #8e8ea0; font-style: italic; margin: 0;">
+                                    "Develop a passion for learning. If you do, you will never cease to grow."<br>
+                                    <span style="color: #c5c5d2; font-weight: 500; margin-top: 8px; display: inline-block;">
+                                        - Anthony J. D'Angelo
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                """, visible=True)
 
-                # Chatbot - using HTML for full control
-                chatbot = gr.HTML(
-                    value="",
-                    visible=False,
-                    elem_classes="chatbot-wrapper"
+                # Chatbot - using standard Gradio Chatbot
+                chatbot = gr.Chatbot(
+                    value=[],
+                    height=600,
+                    show_label=False,
+                    container=False,
+                    elem_classes="chatbot-wrapper",
+                    avatar_images=(None, None),
+                    bubble_full_width=False,
+                    render_markdown=False,
+                    show_copy_button=False,
+                    visible=False
                 )
 
-                # Input - MINIMAL SPACE
+                # Input
                 with gr.Column(elem_classes="input-area"):
-                    with gr.Column(elem_classes="input-container"):
-                        msg = gr.Textbox(
-                            placeholder='Message Sarjak or type "/" for commands...',
-                            show_label=False,
-                            container=False,
-                            lines=1,
-                            max_lines=4
-                        )
+                    msg = gr.Textbox(
+                        placeholder='Message Sarjak or type "/" for commands...',
+                        show_label=False,
+                        container=False,
+                        lines=1,
+                        max_lines=4
+                    )
 
-                        gr.HTML("""
-                            <div class="hint-text">
-                                Try: <span class="command-hint">/projects</span> <span class="command-hint">/experience</span> <span class="command-hint">/skills</span> or ask anything!
-                            </div>
-                        """)
+                    gr.HTML("""
+                        <div class="hint-text">
+                            Try: <span class="command-hint">/projects</span> <span class="command-hint">/experience</span> <span class="command-hint">/skills</span>
+                        </div>
+                    """)
 
         # EVENT HANDLERS
 
-        def process_msg(message: str, chat_html: str, started: bool):
-            """Process user message"""
+        def send_message(message: str, history: List):
+            """Send message and get response"""
             if not message or not message.strip():
-                return chat_html, "", gr.update(), gr.update(), started
+                return history, "", gr.update(), gr.update()
 
-            # Get AI response
+            # Add user message immediately
+            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="flex:1;text-align:right;color:#ececf1;font-size:15px;line-height:1.6;">{message}</div><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(84,54,218,0.3);">👤</div></div></div>'
+
+            # Show typing indicator
+            typing_msg = '<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>'
+
+            temp_history = history + [[user_msg, typing_msg]]
+
+            # Get response
             response = conversation_manager.process_message(message.strip())
 
-            # Format messages - USER RIGHT, BOT LEFT
-            user_html = format_user_message(message)
-            bot_html = format_bot_message(response)
-            new_chat_html = chat_html + user_html + bot_html
+            # Replace typing with actual response
+            bot_msg = f'<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div><div style="flex:1;color:#ececf1;font-size:15px;line-height:1.6;">{response}</div></div></div>'
 
-            return (
-                new_chat_html,
-                "",
-                gr.update(visible=False),
-                gr.update(visible=True, value=new_chat_html),
-                True
-            )
+            history.append([user_msg, bot_msg])
 
-        def clear():
-            """Clear chat"""
-            return (
-                "",
-                gr.update(visible=True),
-                gr.update(visible=False, value=""),
-                False
-            )
+            return history, "", gr.update(visible=False), gr.update(visible=True)
 
-        def toggle(is_open: bool):
+        def clear_chat():
+            """Clear chat history"""
+            return [], gr.update(visible=True), gr.update(visible=False)
+
+        def toggle_sidebar(is_open: bool):
             """Toggle sidebar"""
             new_state = not is_open
             if new_state:
@@ -191,70 +166,34 @@ def create_app():
                     new_state
                 )
 
-        def handle_cmd(cmd: str, chat_html: str, started: bool):
-            """Handle sidebar commands"""
+        def handle_command(cmd: str, history: List):
+            """Handle sidebar button click"""
             response = conversation_manager.process_message(cmd)
 
-            # Format messages
-            user_html = format_user_message(cmd)
-            bot_html = format_bot_message(response)
-            new_chat_html = chat_html + user_html + bot_html
+            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="flex:1;text-align:right;">{cmd}</div><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div></div></div>'
 
-            return (
-                new_chat_html,
-                gr.update(visible=False),
-                gr.update(visible=True, value=new_chat_html),
-                True
-            )
+            bot_msg = f'<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;">🤖</div><div style="flex:1;">{response}</div></div></div>'
+
+            history.append([user_msg, bot_msg])
+            return history, gr.update(visible=False), gr.update(visible=True)
 
         # Connect events
-        msg.submit(
-            process_msg,
-            [msg, chatbot, chat_started],
-            [chatbot, msg, welcome, chatbot, chat_started]
-        )
+        msg.submit(send_message, [msg, chatbot], [
+                   chatbot, msg, welcome, chatbot])
+        clear_btn.click(clear_chat, [], [chatbot, welcome, chatbot])
+        toggle_btn.click(toggle_sidebar, [sidebar_open], [
+                         sidebar, toggle_btn, main, sidebar_open])
 
-        clear_btn.click(
-            clear,
-            [],
-            [chatbot, welcome, chatbot, chat_started]
-        )
-
-        toggle_btn.click(
-            toggle,
-            [sidebar_open],
-            [sidebar, toggle_btn, main, sidebar_open]
-        )
-
-        skills_btn.click(
-            lambda h, s: handle_cmd("/skills", h, s),
-            [chatbot, chat_started],
-            [chatbot, welcome, chatbot, chat_started]
-        )
-
-        exp_btn.click(
-            lambda h, s: handle_cmd("/experience", h, s),
-            [chatbot, chat_started],
-            [chatbot, welcome, chatbot, chat_started]
-        )
-
-        proj_btn.click(
-            lambda h, s: handle_cmd("/projects", h, s),
-            [chatbot, chat_started],
-            [chatbot, welcome, chatbot, chat_started]
-        )
-
-        edu_btn.click(
-            lambda h, s: handle_cmd("/education", h, s),
-            [chatbot, chat_started],
-            [chatbot, welcome, chatbot, chat_started]
-        )
-
-        contact_btn.click(
-            lambda h, s: handle_cmd("/contact", h, s),
-            [chatbot, chat_started],
-            [chatbot, welcome, chatbot, chat_started]
-        )
+        skills_btn.click(lambda h: handle_command("/skills", h),
+                         [chatbot], [chatbot, welcome, chatbot])
+        exp_btn.click(lambda h: handle_command("/experience", h),
+                      [chatbot], [chatbot, welcome, chatbot])
+        proj_btn.click(lambda h: handle_command("/projects", h),
+                       [chatbot], [chatbot, welcome, chatbot])
+        edu_btn.click(lambda h: handle_command("/education", h),
+                      [chatbot], [chatbot, welcome, chatbot])
+        contact_btn.click(lambda h: handle_command(
+            "/contact", h), [chatbot], [chatbot, welcome, chatbot])
 
     return app
 
