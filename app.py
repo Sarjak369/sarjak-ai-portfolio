@@ -8,7 +8,6 @@ from src.agent.conversation import ConversationManager
 from src.utils.logger import logger
 import config
 
-
 logger.info("Initializing portfolio...")
 conversation_manager = ConversationManager()
 logger.info("✅ Ready!")
@@ -97,11 +96,14 @@ def create_app():
                     container=False,
                     elem_classes="chatbot-wrapper",
                     avatar_images=(None, None),
-                    bubble_full_width=False,
                     render_markdown=False,
                     show_copy_button=False,
-                    visible=False
+                    visible=False,
+                    type="messages",  # new format for Gradio ≥ 4.31
                 )
+
+                # Hidden HTML used to run tiny scripts (e.g., autoscroll)
+                scroll_exec = gr.HTML("", visible=False)
 
                 # Input
                 with gr.Column(elem_classes="input-area"):
@@ -124,29 +126,142 @@ def create_app():
         def send_message(message: str, history: List):
             """Send message and get response"""
             if not message or not message.strip():
-                return history, "", gr.update(), gr.update()
+                # also clear scroll runner
+                return history, "", gr.update(), gr.update(), gr.update(value="")
 
-            # Add user message immediately
-            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="flex:1;text-align:left;color:#ececf1;font-size:15px;line-height:1.6;">{message}</div><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(84,54,218,0.3);">👤</div></div></div>'
+            # ===== USER MESSAGE BUBBLE =====
+            user_msg = f'''
+                <div style="
+                    display: flex;
+                    justify-content: flex-end;
+                    padding: 8px 20px;
+                ">
+                <div style="
+                    display: flex;
+                    align-items: center; /* keep avatar level with bubble */
+                    gap: 10px;
+                    max-width: 80%;
+                ">
+                    <div style="
+                        flex: 1;
+                        width: fit-content;
+                        max-width: 520px;                /* ⬆ wider user bubble */
+                        word-wrap: break-word;
+                        background: linear-gradient(135deg, #3a3a3a 0%, #2f2f2f 100%);
+                        padding: 6px 12px 8px 12px;       /* ⬆ tighter top padding */
+                        border-radius: 16px 16px 0 16px;
+                        color: #f5f5f5;
+                        font-size: 15px;
+                        line-height: 1.45;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                        border: 1px solid rgba(255,255,255,0.05);
+                        text-align: left;
+                    ">{message}</div>
+                    <div style="
+                        width: 34px;
+                        height: 34px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #5436DA 0%, #7154FF 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 16px;
+                        flex-shrink: 0;
+                        box-shadow: 0 0 8px rgba(84,54,218,0.3);
+                        color: #fff;
+                    ">👤</div>
+                </div>
+                </div>
+                '''
 
             # Show typing indicator
-            typing_msg = '<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>'
+            typing_msg = (
+                '<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;">'
+                '<div style="max-width:80%;display:flex;gap:12px;align-items:flex-start;">'
+                '<div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;'
+                'justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div>'
+                '<div class="typing-indicator"><span></span><span></span><span></span></div>'
+                '</div></div>'
+            )
 
-            temp_history = history + [[user_msg, typing_msg]]
+            temp_history = history + [
+                {"role": "user", "content": user_msg},
+                {"role": "assistant", "content": typing_msg},
+            ]
 
             # Get response
             response = conversation_manager.process_message(message.strip())
 
-            # Replace typing with actual response
-            bot_msg = f'<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div><div style="flex:1;color:#ececf1;font-size:15px;line-height:1.6;">{response}</div></div></div>'
+            # ===== BOT MESSAGE BUBBLE =====
+            bot_msg = f'''
+                <div style="
+                    display: flex;
+                    justify-content: flex-start;
+                    padding: 8px 20px;
+                ">
+                <div style="
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                    max-width: 80%;
+                ">
+                    <div style="
+                        width: 34px;
+                        height: 34px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #10a37f 0%, #0e8b6b 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 16px;
+                        flex-shrink: 0;
+                        box-shadow: 0 0 8px rgba(16,163,127,0.3);
+                        color: #fff;
+                    ">🤖</div>
+                    <div style="
+                        flex: 1;
+                        width: fit-content;
+                        max-width: 560px;               /* ⬆ wider bot bubble */
+                        word-wrap: break-word;
+                        background: linear-gradient(135deg, #262626 0%, #2e2e2e 100%);
+                        padding: 10px 14px;
+                        border-radius: 16px 16px 16px 0;
+                        color: #ececf1;
+                        font-size: 15px;
+                        line-height: 1.6;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                        border: 1px solid rgba(255,255,255,0.05);
+                        text-align: left;
+                    ">{response}</div>
+                </div>
+                </div>
+                '''
 
-            history.append([user_msg, bot_msg])
+            # Replace typing with actual response (append as two role messages)
+            history.append({"role": "user", "content": user_msg})
+            history.append({"role": "assistant", "content": bot_msg})
 
-            return history, "", gr.update(visible=False), gr.update(visible=True)
+            # tiny script: scroll chat panel to bottom (smooth)
+            scroll_script = """
+            <script>
+            setTimeout(() => {
+                const el = document.querySelector('.chatbot-wrapper');
+                if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+            }, 0);
+            </script>
+            """
+
+            return (
+                history,           # chatbot value
+                "",                # clear textbox
+                gr.update(visible=False),  # hide welcome
+                gr.update(visible=True),   # show chatbot
+                gr.update(value=scroll_script)  # run scroll
+            )
 
         def clear_chat():
             """Clear chat history"""
-            return [], gr.update(visible=True), gr.update(visible=False)
+            return [], gr.update(visible=True), gr.update(visible=False), gr.update(value="")
 
         def toggle_sidebar(is_open: bool):
             """Toggle sidebar"""
@@ -170,30 +285,69 @@ def create_app():
             """Handle sidebar button click"""
             response = conversation_manager.process_message(cmd)
 
-            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="flex:1;text-align:left;">{cmd}</div><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div></div></div>'
+            user_msg = f'''
+                <div style="display:flex;justify-content:flex-end;padding:8px 20px;">
+                <div style="display:flex;align-items:center;gap:10px;max-width:80%;">
+                    <div style="
+                        flex:1;width:fit-content;max-width:520px;word-wrap:break-word;
+                        background:linear-gradient(135deg,#3a3a3a 0%,#2f2f2f 100%);
+                        padding:6px 12px 8px 12px;border-radius:16px 16px 0 16px;color:#f5f5f5;
+                        font-size:15px;line-height:1.45;box-shadow:0 2px 6px rgba(0,0,0,0.25);
+                        border:1px solid rgba(255,255,255,0.05);text-align:left;"
+                    >{cmd}</div>
+                    <div style="width:34px;height:34px;border-radius:50%;
+                        background:linear-gradient(135deg,#5436DA 0%,#7154FF 100%);display:flex;align-items:center;justify-content:center;
+                        font-size:16px;flex-shrink:0;box-shadow:0 0 8px rgba(84,54,218,0.3);color:#fff;">👤</div>
+                </div></div>
+            '''
 
-            bot_msg = f'<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;">🤖</div><div style="flex:1;">{response}</div></div></div>'
+            bot_msg = f'''
+                <div style="display:flex;justify-content:flex-start;padding:8px 20px;">
+                <div style="display:flex;align-items:flex-start;gap:10px;max-width:80%;">
+                    <div style="width:34px;height:34px;border-radius:50%;
+                        background:linear-gradient(135deg,#10a37f 0%,#0e8b6b 100%);display:flex;align-items:center;justify-content:center;
+                        font-size:16px;flex-shrink:0;box-shadow:0 0 8px rgba(16,163,127,0.3);color:#fff;">🤖</div>
+                    <div style="
+                        flex:1;width:fit-content;max-width:560px;word-wrap:break-word;
+                        background:linear-gradient(135deg,#262626 0%,#2e2e2e 100%);
+                        padding:10px 14px;border-radius:16px 16px 16px 0;color:#ececf1;font-size:15px;line-height:1.6;
+                        box-shadow:0 2px 6px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);text-align:left;"
+                    >{response}</div>
+                </div></div>
+            '''
 
-            history.append([user_msg, bot_msg])
-            return history, gr.update(visible=False), gr.update(visible=True)
+            history.append({"role": "user", "content": user_msg})
+            history.append({"role": "assistant", "content": bot_msg})
+
+            scroll_script = """
+            <script>
+            setTimeout(() => {
+                const el = document.querySelector('.chatbot-wrapper');
+                if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+            }, 0);
+            </script>
+            """
+
+            return history, gr.update(visible=False), gr.update(visible=True), gr.update(value=scroll_script)
 
         # Connect events
         msg.submit(send_message, [msg, chatbot], [
-                   chatbot, msg, welcome, chatbot])
-        clear_btn.click(clear_chat, [], [chatbot, welcome, chatbot])
+                   chatbot, msg, welcome, chatbot, scroll_exec])
+        clear_btn.click(clear_chat, [], [
+                        chatbot, welcome, chatbot, scroll_exec])
         toggle_btn.click(toggle_sidebar, [sidebar_open], [
                          sidebar, toggle_btn, main, sidebar_open])
 
         skills_btn.click(lambda h: handle_command("/skills", h),
-                         [chatbot], [chatbot, welcome, chatbot])
+                         [chatbot], [chatbot, welcome, chatbot, scroll_exec])
         exp_btn.click(lambda h: handle_command("/experience", h),
-                      [chatbot], [chatbot, welcome, chatbot])
+                      [chatbot], [chatbot, welcome, chatbot, scroll_exec])
         proj_btn.click(lambda h: handle_command("/projects", h),
-                       [chatbot], [chatbot, welcome, chatbot])
+                       [chatbot], [chatbot, welcome, chatbot, scroll_exec])
         edu_btn.click(lambda h: handle_command("/education", h),
-                      [chatbot], [chatbot, welcome, chatbot])
+                      [chatbot], [chatbot, welcome, chatbot, scroll_exec])
         contact_btn.click(lambda h: handle_command(
-            "/contact", h), [chatbot], [chatbot, welcome, chatbot])
+            "/contact", h), [chatbot], [chatbot, welcome, chatbot, scroll_exec])
 
     return app
 

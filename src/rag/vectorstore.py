@@ -5,7 +5,7 @@ import chromadb
 from chromadb.config import Settings
 from typing import List, Dict, Any, Optional
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.schema import Document
 from src.utils.logger import logger
 import config
