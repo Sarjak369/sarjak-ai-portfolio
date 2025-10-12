@@ -29,30 +29,34 @@ def create_app():
                 gr.HTML("""
                     <div style="padding: 12px; margin-bottom: 8px;">
                         <div style="font-size: 16px; font-weight: 600;">
-                            💬 Sarjak's Portfolio
+                            💬 Sarjak's AI Portfolio
                         </div>
                     </div>
+                    <div class="nav-section">
                 """)
 
+                # Navigation buttons
                 skills_btn = gr.Button("🎯 Skills", elem_classes="nav-item")
                 exp_btn = gr.Button("💼 Experience", elem_classes="nav-item")
                 proj_btn = gr.Button("🚀 Projects", elem_classes="nav-item")
                 edu_btn = gr.Button("🎓 Education", elem_classes="nav-item")
                 contact_btn = gr.Button("📧 Contact", elem_classes="nav-item")
 
-                gr.HTML("""
-                    <div class="profile-section">
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 8px;">
-                            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; color: white;">
-                                SM
-                            </div>
-                            <div>
-                                <div style="font-size: 14px; font-weight: 500; color: #ececf1;">Sarjak Maniar</div>
-                                <div style="font-size: 12px; color: #8e8ea0;">AI/ML Engineer</div>
-                            </div>
-                        </div>
-                    </div>
-                """)
+                # ---- FOOTER PROFILE CARD ----
+
+                gr.HTML(""" 
+                        <div 
+                        style=" display: flex; 
+                        align-items: center; 
+                        gap: 10px; 
+                        padding: 12px 16px; 
+                        border-top: 1px solid rgba(255,255,255,0.08); 
+                        background: rgba(0,0,0,0.15); 
+                        margin-top: auto; /* pushes footer to bottom of sidebar */ 
+                        position: sticky; bottom: 0; "> 
+                        
+                        <div style=" background: linear-gradient(135deg, #19c37d, #0e8b6b); 
+                        color: white; font-weight: 600; font-size: 14px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; ">SM</div> <div style="display: flex; flex-direction: column; line-height: 1.2;"> <span style="color: #ececf1; font-size: 14px; font-weight: 600;">Sarjak Maniar</span> <span style="color: #8e8ea0; font-size: 12px;">AI/ML Engineer</span> </div> </div> """)
 
             # MAIN CONTENT
             with gr.Column(elem_classes="main-content") as main:

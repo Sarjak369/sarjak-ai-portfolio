@@ -65,15 +65,33 @@ footer {
     width: 260px !important;
     min-width: 260px !important;
     padding: 8px !important;
-    position: fixed !important;
     left: 0 !important;
     top: 0 !important;
     height: 100vh !important;
     z-index: 50 !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    overflow-y: auto !important;          /* ✅ allows scrolling if content grows */
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3) !important;
 }
+
+/* === FIX: Stick Profile Card to Bottom === */
+.sidebar-column > div:last-of-type {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    padding: 12px 16px !important;
+}
+
+
+.sidebar-column { padding-bottom: 70px !important; }
+
 .sidebar-column.collapsed { transform: translateX(-260px) !important; }
+
 
 button.nav-item {
     width: 100% !important;
