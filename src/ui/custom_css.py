@@ -1,11 +1,9 @@
 """
-Custom CSS - EXACT ChatGPT Style - FIXED VERSION
+Custom CSS - ChatGPT Style - FINAL WORKING VERSION
 """
 
 CHATGPT_CSS = """
-/* ============================================
-   EXACT ChatGPT Colors
-   ============================================ */
+/* Colors */
 :root {
     --bg-main: #212121;
     --bg-sidebar: #171717;
@@ -27,58 +25,53 @@ body, .gradio-container {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
     background: var(--bg-main) !important;
     color: var(--text-primary) !important;
+    height: 100vh !important;
+    overflow: hidden !important;
 }
 
-/* Remove all default Gradio spacing */
-.gradio-container {
+/* Kill ALL Gradio defaults */
+.gradio-container, .contain, .gap, .block, .form {
     padding: 0 !important;
     margin: 0 !important;
-    max-width: 100% !important;
     gap: 0 !important;
-}
-
-.contain, .gap, .block, .form {
-    gap: 0 !important;
-    padding: 0 !important;
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
+    max-width: 100% !important;
 }
 
 footer {
     display: none !important;
 }
 
-html, body, .gradio-container {
+/* ============= LAYOUT FIX ============= */
+.gradio-container > .main {
     height: 100vh !important;
-    overflow: hidden !important;
 }
 
-/* ============================================
-   SIDEBAR - Fixed 260px
-   ============================================ */
+.gradio-container .main > .contain {
+    height: 100vh !important;
+}
+
+/* ============= SIDEBAR ============= */
 .sidebar-column {
     background: var(--bg-sidebar) !important;
     border-right: 1px solid var(--border-subtle) !important;
     width: 260px !important;
     min-width: 260px !important;
-    max-width: 260px !important;
     height: 100vh !important;
     padding: 8px !important;
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
     z-index: 50 !important;
-    transition: transform 0.2s ease !important;
-    display: flex !important;
-    flex-direction: column !important;
+    transition: transform 0.2s !important;
 }
 
 .sidebar-column.collapsed {
     transform: translateX(-260px) !important;
 }
 
-/* Sidebar buttons */
 button.nav-item {
     width: 100% !important;
     text-align: left !important;
@@ -89,7 +82,6 @@ button.nav-item {
     color: var(--text-primary) !important;
     font-size: 14px !important;
     cursor: pointer !important;
-    transition: background 0.1s ease !important;
     margin-bottom: 2px !important;
 }
 
@@ -97,16 +89,16 @@ button.nav-item:hover {
     background: #2a2b32 !important;
 }
 
-/* Profile at bottom */
 .profile-section {
-    margin-top: auto !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     padding: 12px !important;
     border-top: 1px solid var(--border-subtle) !important;
 }
 
-/* ============================================
-   TOGGLE BUTTON - Like ChatGPT
-   ============================================ */
+/* ============= TOGGLE & CLEAR ============= */
 .toggle-btn {
     position: fixed !important;
     top: 8px !important;
@@ -119,190 +111,18 @@ button.nav-item:hover {
     color: var(--text-secondary) !important;
     cursor: pointer !important;
     z-index: 100 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     font-size: 20px !important;
-    transition: all 0.2s ease !important;
-}
-
-.toggle-btn:hover {
-    background: rgba(255,255,255,0.1) !important;
+    transition: left 0.2s !important;
 }
 
 .toggle-btn.sidebar-closed {
     left: 8px !important;
 }
 
-/* ============================================
-   MAIN CONTENT AREA
-   ============================================ */
-.main-content {
-    margin-left: 260px !important;
-    height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: var(--bg-main) !important;
-    transition: margin-left 0.2s ease !important;
+.toggle-btn:hover {
+    background: rgba(255,255,255,0.1) !important;
 }
 
-.main-content.sidebar-closed {
-    margin-left: 0 !important;
-}
-
-/* ============================================
-   WELCOME SCREEN - Centered, No Scroll
-   ============================================ */
-.welcome-screen {
-    flex: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 40px !important;
-    text-align: center !important;
-    overflow: hidden !important;
-}
-
-/* ============================================
-   CHATBOT AREA - Clean ChatGPT Style
-   ============================================ */
-.chatbot-wrapper {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    padding: 0 !important;
-}
-
-/* Hide Gradio's chatbot container styling */
-.chatbot-wrapper .block,
-.chatbot-wrapper .contain {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-}
-
-/* Message container - alternating backgrounds */
-.message-wrap {
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    background: transparent !important;
-}
-
-/* User message - dark background */
-.message-wrap:nth-child(odd) {
-    background: var(--bg-main) !important;
-}
-
-/* Bot message - lighter background */
-.message-wrap:nth-child(even) {
-    background: var(--bg-secondary) !important;
-}
-
-/* Message content - centered, max-width */
-.message {
-    max-width: 48rem !important;
-    margin: 0 auto !important;
-    padding: 24px !important;
-    display: flex !important;
-    gap: 16px !important;
-    align-items: flex-start !important;
-}
-
-/* Remove all Gradio default styling */
-.chatbot-wrapper .prose {
-    max-width: 100% !important;
-}
-
-.chatbot-wrapper .message-wrap > div {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-}
-
-/* ============================================
-   AVATARS - Clean & Simple
-   ============================================ */
-.avatar {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    border-radius: 4px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-}
-
-.user-avatar {
-    background: #5436DA !important;
-    color: white !important;
-}
-
-.bot-avatar {
-    background: var(--accent-green) !important;
-    color: white !important;
-    font-size: 18px !important;
-}
-
-/* ============================================
-   INPUT AREA - Bottom Fixed
-   ============================================ */
-.input-area {
-    padding: 16px 24px 24px 24px !important;
-    background: var(--bg-main) !important;
-    border-top: 1px solid var(--border-subtle) !important;
-}
-
-.input-container {
-    max-width: 48rem !important;
-    margin: 0 auto !important;
-    position: relative !important;
-}
-
-textarea {
-    width: 100% !important;
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: 12px !important;
-    color: var(--text-primary) !important;
-    font-size: 16px !important;
-    padding: 12px 16px !important;
-    resize: none !important;
-    max-height: 200px !important;
-}
-
-textarea:focus {
-    outline: none !important;
-    border-color: #565869 !important;
-}
-
-textarea::placeholder {
-    color: var(--text-muted) !important;
-}
-
-/* Hint text below input */
-.hint-text {
-    text-align: center !important;
-    font-size: 12px !important;
-    color: var(--text-muted) !important;
-    margin-top: 12px !important;
-}
-
-.command-hint {
-    background: var(--bg-secondary) !important;
-    padding: 4px 8px !important;
-    border-radius: 6px !important;
-    margin: 0 4px !important;
-    font-family: monospace !important;
-}
-
-/* ============================================
-   CLEAR BUTTON - Top Right
-   ============================================ */
 .clear-btn {
     position: fixed !important;
     top: 8px !important;
@@ -315,9 +135,6 @@ textarea::placeholder {
     color: var(--text-secondary) !important;
     cursor: pointer !important;
     z-index: 100 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     font-size: 18px !important;
 }
 
@@ -325,54 +142,234 @@ textarea::placeholder {
     background: rgba(255,255,255,0.1) !important;
 }
 
-/* ============================================
-   Scrollbar
-   ============================================ */
-::-webkit-scrollbar {
+/* Hide duplicate buttons */
+button:not(.toggle-btn):not(.clear-btn):not(.nav-item)[value*="☰"],
+button:not(.toggle-btn):not(.clear-btn):not(.nav-item)[value*="🗑"] {
+    display: none !important;
+}
+
+/* ============= MAIN CONTENT ============= */
+.main-content {
+    margin-left: 260px !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: margin-left 0.2s !important;
+}
+
+.main-content.sidebar-closed {
+    margin-left: 0 !important;
+}
+
+/* Force proper column structure */
+.main-content > .block {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+}
+
+/* ============= WELCOME ============= */
+.welcome-screen {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 40px !important;
+    overflow: hidden !important;
+}
+
+/* ============= CHAT AREA - TAKES MOST SPACE ============= */
+.chatbot-wrapper {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    background: var(--bg-main) !important;
+    min-height: 0 !important;
+}
+
+/* Remove ALL Gradio styling */
+.chatbot-wrapper > div,
+.chatbot-wrapper .block,
+.chatbot-wrapper .contain {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100% !important;
+}
+
+/* ============= MESSAGES - RIGHT FOR USER, LEFT FOR BOT ============= */
+.chat-message {
+    width: 100% !important;
+    padding: 20px 24px !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+}
+
+.chat-message.user-message {
+    background: var(--bg-main) !important;
+    justify-content: flex-end !important;
+}
+
+.chat-message.bot-message {
+    background: var(--bg-secondary) !important;
+    justify-content: flex-start !important;
+}
+
+.message-bubble {
+    max-width: 65% !important;
+    display: flex !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+}
+
+.message-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+}
+
+.user-avatar {
+    background: #5436DA !important;
+    order: 2 !important;
+}
+
+.bot-avatar {
+    background: var(--accent-green) !important;
+    order: 1 !important;
+}
+
+.message-text {
+    flex: 1 !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+}
+
+.user-message .message-text {
+    order: 1 !important;
+    text-align: right !important;
+}
+
+.bot-message .message-text {
+    order: 2 !important;
+}
+
+/* Remove boxes from content */
+.message-text > div,
+.message-text > p {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 0 8px 0 !important;
+}
+
+.message-text h2 {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0 0 12px 0 !important;
+}
+
+.message-text h3 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin: 12px 0 6px 0 !important;
+}
+
+/* Cards in responses */
+.message-text div[style*="rgba(255,255,255,0.03)"] {
+    margin: 8px 0 !important;
+    padding: 14px !important;
+    text-align: left !important;
+}
+
+/* ============= INPUT AREA - MINIMAL AT BOTTOM ============= */
+.input-area {
+    flex-shrink: 0 !important;
+    padding: 12px 24px 16px 24px !important;
+    background: var(--bg-main) !important;
+    border-top: 1px solid var(--border-subtle) !important;
+}
+
+.input-container {
+    max-width: 48rem !important;
+    margin: 0 auto !important;
+}
+
+.input-container > .block {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+textarea {
+    width: 100% !important;
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    padding: 10px 14px !important;
+    resize: none !important;
+    min-height: 44px !important;
+    max-height: 200px !important;
+}
+
+textarea:focus {
+    outline: none !important;
+    border-color: #565869 !important;
+}
+
+.hint-text {
+    text-align: center !important;
+    font-size: 11px !important;
+    color: var(--text-muted) !important;
+    margin-top: 8px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+}
+
+.command-hint {
+    background: var(--bg-secondary) !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    margin: 0 3px !important;
+    font-family: monospace !important;
+    font-size: 10px !important;
+}
+
+/* Remove scroller from hints */
+.hint-text::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* ============= SCROLLBAR ============= */
+.chatbot-wrapper::-webkit-scrollbar {
     width: 8px !important;
 }
 
-::-webkit-scrollbar-track {
+.chatbot-wrapper::-webkit-scrollbar-track {
     background: transparent !important;
 }
 
-::-webkit-scrollbar-thumb {
+.chatbot-wrapper::-webkit-scrollbar-thumb {
     background: #565869 !important;
     border-radius: 4px !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #6e6e80 !important;
-}
-
-/* ============================================
-   HIDE GRADIO DEFAULTS
-   ============================================ */
-.chatbot .avatar-container {
-    display: none !important;
-}
-
-.chatbot .message-buttons-bot,
-.chatbot .message-buttons-user {
-    display: none !important;
-}
-
-/* Remove duplicate buttons */
-button[value="🗑️"]:not(.clear-btn) {
-    display: none !important;
-}
-
-/* ============================================
-   Responsive
-   ============================================ */
+/* ============= RESPONSIVE ============= */
 @media (max-width: 768px) {
-    .sidebar-column {
-        position: fixed !important;
-        z-index: 100 !important;
-    }
-    
     .main-content {
         margin-left: 0 !important;
+    }
+    
+    .sidebar-column {
+        z-index: 100 !important;
     }
     
     .toggle-btn {
@@ -381,6 +378,10 @@ button[value="🗑️"]:not(.clear-btn) {
     
     .toggle-btn.sidebar-open {
         left: 268px !important;
+    }
+    
+    .message-bubble {
+        max-width: 85% !important;
     }
 }
 """
