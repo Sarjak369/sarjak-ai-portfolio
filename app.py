@@ -221,7 +221,8 @@ def create_app():
                     <div style="
                         flex: 1;
                         width: fit-content;
-                        max-width: 560px;               /* ⬆ wider bot bubble */
+                        max-width: clamp(520px, 62vw, 760px);
+                        clamp(520px, 62vw, 760px);               
                         word-wrap: break-word;
                         background: linear-gradient(135deg, #262626 0%, #2e2e2e 100%);
                         padding: 10px 14px;
@@ -308,7 +309,7 @@ def create_app():
                         background:linear-gradient(135deg,#10a37f 0%,#0e8b6b 100%);display:flex;align-items:center;justify-content:center;
                         font-size:16px;flex-shrink:0;box-shadow:0 0 8px rgba(16,163,127,0.3);color:#fff;">🤖</div>
                     <div style="
-                        flex:1;width:fit-content;max-width:560px;word-wrap:break-word;
+                        flex:1;width:fit-content;max-width: clamp(520px, 62vw, 760px);word-wrap:break-word;
                         background:linear-gradient(135deg,#262626 0%,#2e2e2e 100%);
                         padding:10px 14px;border-radius:16px 16px 16px 0;color:#ececf1;font-size:15px;line-height:1.6;
                         box-shadow:0 2px 6px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);text-align:left;"

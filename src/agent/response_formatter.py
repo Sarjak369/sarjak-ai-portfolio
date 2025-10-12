@@ -117,27 +117,62 @@ class ResponseFormatter:
         return html
 
     def format_contact(self) -> str:
-        """Format contact information"""
-        html = f'''
-        <h2 style="color: #ececf1; margin-bottom: 20px; font-size: 20px; font-weight: 600;">📧 Contact Information</h2>
-        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-            <p style="color: #c5c5d2; margin-bottom: 10px; font-size: 15px;">
-                📧 <strong>Email:</strong> <a href="mailto:{self.profile.get('email', '')}" style="color: #19c37d; text-decoration: none;">{self.profile.get('email', '')}</a>
-            </p>
-            <p style="color: #c5c5d2; margin-bottom: 10px; font-size: 15px;">
-                📱 <strong>Phone:</strong> {self.profile.get('phone', '')}
-            </p>
-            <p style="color: #c5c5d2; margin-bottom: 10px; font-size: 15px;">
-                💼 <strong>LinkedIn:</strong> <a href="{self.profile.get('links', {}).get('linkedin', '')}" target="_blank" style="color: #19c37d; text-decoration: none;">linkedin.com/in/Sarjak369</a>
-            </p>
-            <p style="color: #c5c5d2; margin-bottom: 10px; font-size: 15px;">
-                🐙 <strong>GitHub:</strong> <a href="{self.profile.get('links', {}).get('github', '')}" target="_blank" style="color: #19c37d; text-decoration: none;">github.com/Sarjak369</a>
-            </p>
-            <p style="color: #c5c5d2; font-size: 15px;">
-                📍 <strong>Location:</strong> {self.profile.get('location', '')}
-            </p>
-        </div>
+        """Contact section styled consistently with Education/Projects cards."""
+        email = self.profile.get("email", "")
+        links = self.profile.get("links", {})
+        linkedin = links.get("linkedin", "https://linkedin.com/in/Sarjak369")
+        github = links.get("github", "https://github.com/Sarjak369")
+        phone = self.profile.get("phone", "")
+        location = self.profile.get("location", "")
+
+        html = '''
+        <h2 style="color: #ececf1; margin-bottom: 20px; font-size: 20px; font-weight: 600;">📇 Contact Information</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
         '''
+
+        # individual cards (consistent with your Projects/Education style)
+        contact_items = [
+            {
+                "icon": "📧",
+                "label": "Email",
+                "value": f'<a href="mailto:{email}" style="color:#19c37d; text-decoration:none;">{email}</a>'
+            },
+            {
+                "icon": "📱",
+                "label": "Phone",
+                "value": phone
+            },
+            {
+                "icon": "💼",
+                "label": "LinkedIn",
+                "value": f'<a href="{linkedin}" target="_blank" style="color:#19c37d; text-decoration:none;">{linkedin.replace("https://", "")}</a>'
+            },
+            {
+                "icon": "🐙",
+                "label": "GitHub",
+                "value": f'<a href="{github}" target="_blank" style="color:#19c37d; text-decoration:none;">{github.replace("https://", "")}</a>'
+            },
+            {
+                "icon": "📍",
+                "label": "Location",
+                "value": location
+            }
+        ]
+
+        for item in contact_items:
+            html += f'''
+            <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: 8px; 
+                        border: 1px solid rgba(255,255,255,0.05);">
+                <h3 style="color: #ececf1; font-size: 16px; font-weight: 600; margin-bottom: 6px;">
+                    {item["icon"]} {item["label"]}
+                </h3>
+                <p style="color: #c5c5d2; font-size: 15px; line-height: 1.6; margin: 0;">
+                    {item["value"]}
+                </p>
+            </div>
+            '''
+
+        html += "</div>"
         return html
 
     def format_command_response(self, command: str) -> str:
@@ -148,7 +183,7 @@ class ResponseFormatter:
             command: Command name
 
         Returns:
-            Formatted HTML response (no wrapper divs)
+            Formatted HTML response(no wrapper divs)
         """
         formatters = {
             "/projects": self.format_projects,

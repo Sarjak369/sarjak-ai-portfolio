@@ -140,8 +140,11 @@ button.nav-item:active { transform: scale(0.98) !important; }
     padding-bottom: 140px !important;
 }
 .main-content.sidebar-closed { margin-left: 0 !important; }
-.main-content.sidebar-closed ~ .input-area,
-.sidebar-closed ~ * .input-area { left: 0 !important; }
+
+/* When the sidebar is collapsed, shift the fixed input area to start at the left edge */
+.main-content.sidebar-closed .input-area {
+    left: 0 !important;
+}
 
 /* ===== WELCOME SCREEN ===== */
 .main-content > div:first-of-type {
