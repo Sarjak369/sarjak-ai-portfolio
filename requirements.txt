@@ -11,4 +11,7 @@ gtts
 pydub
 numpy
 pandas
-
+langchain_openai
+langchain_ollama
+python-dotenv
+langchain-huggingface

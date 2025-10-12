@@ -3,6 +3,11 @@ Configuration settings for the portfolio application
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+from typing import Optional
+
+# Load environment variables
+load_dotenv()
 
 # Base directory
 BASE_DIR = Path(__file__).parent
@@ -19,10 +24,18 @@ EDUCATION_DATA = DATA_DIR / "education.json"
 CHROMA_DB_DIR = BASE_DIR / "chroma_db"
 COLLECTION_NAME = "sarjak_portfolio"
 
-# LLM settings
-LLM_MODEL = "llama3.2"  # Ollama model name
-LLM_TEMPERATURE = 0.7
-LLM_MAX_TOKENS = 512
+# LLM settings - Multi-provider support
+# Options: "openai" or "ollama"
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
+
+# OpenAI settings
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = "gpt-4o-mini"  # Fast and cheap for testing
+OPENAI_TEMPERATURE = 0.7
+
+# Ollama settings (for production)
+OLLAMA_MODEL = "llama3.2"
+OLLAMA_TEMPERATURE = 0.7
 
 # Embedding settings
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -57,11 +70,6 @@ COMMANDS = {
         "icon": "🎓",
         "description": "View my education",
         "action": "show_education"
-    },
-    "/research": {
-        "icon": "📚",
-        "description": "View my research & publications",
-        "action": "show_research"
     },
     "/contact": {
         "icon": "📧",
