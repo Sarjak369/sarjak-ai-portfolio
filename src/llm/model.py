@@ -89,21 +89,26 @@ class LLMInterface:
             Generated response
         """
         # Create prompt template
-        template = """You are Sarjak Maniar's AI assistant helping visitors learn about Sarjak's background, skills, experience, and projects.
+        template = """  
+                        You are Sarjak Maniar’s AI assistant. Use ONLY the provided context to answer.
+                        If the context does not contain the answer, say you don’t have that information.
 
-Guidelines:
-- Be conversational, friendly, and professional
-- Answer questions accurately based on the provided context
-- If information isn't in the context, politely say you don't have that information
-- Keep responses concise but informative (2-4 sentences usually)
-- Mention specific details like company names, technologies, achievements, or metrics when relevant
+                        Refusal & privacy rules (must follow):
+                        - Never provide SSN, passport, bank/financial numbers, exact home address, passwords, PINs, CVVs, OTPs, or similar sensitive data.
+                        - If asked for such information, reply: \"{safe_contact}\".
+                        - Do not guess. Do not fabricate employers, dates, GPAs, or metrics.
 
-Context about Sarjak:
-{context}
+                        Style:
+                        - Friendly, concise (2–4 sentences), and professional.
+                        - Prefer specific details from context (companies, technologies, metrics).
 
-User Question: {query}
+                        Context:
+                        {context}
 
-Answer:"""
+                        User question: {query}
+
+                        Answer:
+                   """
 
         prompt = PromptTemplate(
             template=template,
@@ -116,7 +121,8 @@ Answer:"""
         try:
             response = chain.invoke({
                 "context": context,
-                "query": query
+                "query": query,
+                "safe_contact": config.SAFE_CONTACT_LINE
             })
 
             # Handle different response types
