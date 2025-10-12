@@ -1,30 +1,70 @@
-cat > .gitignore << 'EOF'
+# ======================
 # Python
+# ======================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.venv/
 venv/
 env/
 *.egg-info/
+build/
+dist/
 
-# IDEs
+# ======================
+# IDE / Editor
+# ======================
 .vscode/
 .idea/
+*.swp
+*.swo
 
+# ======================
 # Logs
-logs/*.log
+# ======================
+logs/
 *.log
 
-# Data
-chroma_db/
+# ======================
+# Environment / Secrets
+# ======================
+.env
+.env.*
+.python-version
 
-# OS
+# ======================
+# Data & Artifacts
+# Keep the data folder but ignore its contents by default.
+# Leave a small README so the folder exists in the repo.
+# ======================
+data/**
+!data/README.md
+# (Optionally keep schema/examples)
+!data/schema/**
+# Vector DB and caches
+chroma_db/
+.cache/
+.checkpoints/
+gradio_cached_examples/
+
+# ======================
+# Notebooks & Scratch
+# ======================
+*.ipynb
+notebooks/
+tmp/
+temp/
+scratch/
+
+# ======================
+# Dev-only scripts
+# ======================
+test_rag.py
+
+# ======================
+# OS files
+# ======================
 .DS_Store
 Thumbs.db
-
-# Environment
-.env
-EOF
-.env
