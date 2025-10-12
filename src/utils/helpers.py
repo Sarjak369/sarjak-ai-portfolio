@@ -3,24 +3,29 @@ Helper utility functions
 """
 import json
 import os
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
+from pathlib import Path
 from src.utils.logger import logger
 
 
-def load_json(file_path: str) -> Dict[str, Any]:
+def load_json(file_path: Union[str, Path]) -> Dict[str, Any]:
     """
     Load JSON file
 
     Args:
-        file_path: Path to JSON file
+        file_path: Path to JSON file (str or Path)
 
     Returns:
         Dictionary containing JSON data
     """
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        # Convert Path to str if needed
+        file_path_str = str(file_path) if isinstance(
+            file_path, Path) else file_path
+
+        with open(file_path_str, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        logger.info(f"Successfully loaded {file_path}")
+        logger.info(f"Successfully loaded {file_path_str}")
         return data
     except FileNotFoundError:
         logger.error(f"File not found: {file_path}")
@@ -30,7 +35,7 @@ def load_json(file_path: str) -> Dict[str, Any]:
         return {}
 
 
-def save_json(data: Dict[str, Any], file_path: str) -> bool:
+def save_json(data: Dict[str, Any], file_path: Union[str, Path]) -> bool:
     """
     Save data to JSON file
 
@@ -42,10 +47,12 @@ def save_json(data: Dict[str, Any], file_path: str) -> bool:
         True if successful, False otherwise
     """
     try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
+        file_path_str = str(file_path) if isinstance(
+            file_path, Path) else file_path
+        os.makedirs(os.path.dirname(file_path_str), exist_ok=True)
+        with open(file_path_str, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        logger.info(f"Successfully saved to {file_path}")
+        logger.info(f"Successfully saved to {file_path_str}")
         return True
     except Exception as e:
         logger.error(f"Error saving to {file_path}: {e}")
