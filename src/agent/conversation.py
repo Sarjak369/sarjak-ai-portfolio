@@ -44,20 +44,16 @@ class ConversationManager:
             command = self.router.parse_command(message)
             if command:
                 logger.info(f"Processing command: {command}")
+                # Return raw HTML from formatter (no extra wrapper)
                 return self.formatter.format_command_response(command)
 
         # Otherwise, use RAG to answer
         logger.info(f"Processing query with RAG: {message}")
         answer = self.rag.answer_query(message)
 
-        # Wrap answer in nice formatting
-        return f"""
-        <div style="padding: 20px;">
-            <div style="background: #2f2f2f; padding: 20px; border-radius: 12px; border: 1px solid #3e3e3e;">
-                <p style="color: #c5c5d2; line-height: 1.7; font-size: 15px;">{answer}</p>
-            </div>
-        </div>
-        """
+        # Return clean answer without extra wrapper divs
+        # The app.py will handle the message formatting
+        return answer
 
     def get_stats(self) -> dict:
         """Get system statistics"""

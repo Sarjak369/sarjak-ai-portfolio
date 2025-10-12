@@ -1,133 +1,64 @@
 """
-Sarjak's AI/ML Portfolio - Complete Application
-ChatGPT-inspired interactive portfolio with RAG-powered chat
+Sarjak's AI/ML Portfolio - FIXED VERSION
 """
 import gradio as gr
-from typing import List, Tuple, Any
+from typing import List, Tuple
 from src.ui.custom_css import get_custom_css
 from src.agent.conversation import ConversationManager
 from src.utils.logger import logger
 import config
 
 
-# Initialize conversation manager (will load RAG system)
+# Initialize
 logger.info("Initializing portfolio application...")
 conversation_manager = ConversationManager()
 logger.info("✅ Portfolio application ready!")
 
 
-def create_welcome_message() -> str:
-    """Create welcome message HTML"""
+def create_welcome_html() -> str:
+    """Create clean welcome screen"""
     return """
-    <div style="padding: 60px 40px; text-align: center;">
-        <h1 style="font-size: 36px; font-weight: 600; margin-bottom: 16px; color: #ececf1;">
+    <div style="max-width: 700px;">
+        <h1 style="font-size: 48px; font-weight: 600; margin-bottom: 16px; color: #ececf1;">
             Hi, I'm Sarjak! 👋
         </h1>
-        <p style="font-size: 18px; color: #c5c5d2; margin-bottom: 40px;">
+        <p style="font-size: 20px; color: #c5c5d2; margin-bottom: 48px;">
             Data Scientist | AI & ML Engineer
         </p>
         
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 800px; margin: 0 auto;">
-            
-            <div style="background: #2f2f2f; padding: 24px; border-radius: 12px; border: 1px solid #3e3e3e; cursor: pointer;" 
-                 onclick="document.querySelector('textarea').value='/experience'; document.querySelector('textarea').focus();">
-                <div style="font-size: 32px; margin-bottom: 12px;">💼</div>
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #ececf1;">View Experience</h3>
-                <p style="font-size: 13px; color: #8e8ea0;">Explore my professional journey</p>
-            </div>
-            
-            <div style="background: #2f2f2f; padding: 24px; border-radius: 12px; border: 1px solid #3e3e3e; cursor: pointer;"
-                 onclick="document.querySelector('textarea').value='/projects'; document.querySelector('textarea').focus();">
-                <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #ececf1;">Explore Projects</h3>
-                <p style="font-size: 13px; color: #8e8ea0;">Check out my AI/ML projects</p>
-            </div>
-            
-            <div style="background: #2f2f2f; padding: 24px; border-radius: 12px; border: 1px solid #3e3e3e; cursor: pointer;"
-                 onclick="document.querySelector('textarea').value='/skills'; document.querySelector('textarea').focus();">
-                <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #ececf1;">Technical Skills</h3>
-                <p style="font-size: 13px; color: #8e8ea0;">See my tech stack</p>
-            </div>
-            
-            <div style="background: #2f2f2f; padding: 24px; border-radius: 12px; border: 1px solid #3e3e3e; cursor: pointer;"
-                 onclick="document.querySelector('textarea').value='Tell me about your AI experience'; document.querySelector('textarea').focus();">
-                <div style="font-size: 32px; margin-bottom: 12px;">🤖</div>
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #ececf1;">Ask Me Anything</h3>
-                <p style="font-size: 13px; color: #8e8ea0;">Chat about my skills</p>
-            </div>
-            
-        </div>
+        <p style="font-size: 16px; color: #8e8ea0; line-height: 1.8; margin-bottom: 40px;">
+            Welcome to my interactive AI portfolio! I'm passionate about building intelligent systems 
+            that solve real-world problems. Feel free to ask me anything about my experience, projects, 
+            or technical skills.
+        </p>
         
-        <div style="margin-top: 40px; padding: 20px; background: #2f2f2f; border-radius: 12px; border: 1px solid #3e3e3e; max-width: 600px; margin-left: auto; margin-right: auto;">
-            <p style="font-size: 14px; color: #8e8ea0; font-style: italic; margin: 0;">
+        <div style="padding: 24px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <p style="font-size: 14px; color: #8e8ea0; font-style: italic; margin: 0; line-height: 1.6;">
                 "Develop a passion for learning. If you do, you will never cease to grow."<br>
-                <span style="color: #c5c5d2;">- Anthony J. D'Angelo</span>
+                <span style="color: #c5c5d2; font-weight: 500; margin-top: 8px; display: inline-block;">
+                    - Anthony J. D'Angelo
+                </span>
             </p>
         </div>
     </div>
     """
 
 
-def handle_message(message: str, history: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], str]:
-    """
-    Handle user message and generate response
-
-    Args:
-        message: User message
-        history: Chat history
-
-    Returns:
-        Updated history and empty message box
-    """
-    if not message or not message.strip():
-        return history, ""
-
-    # Process message through conversation manager
-    response = conversation_manager.process_message(message)
-
-    # Add to history
-    history.append((message, response))
-
-    return history, ""
-
-
-def handle_sidebar_click(command: str, history: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], Any, Any]:
-    """
-    Handle sidebar button click
-
-    Args:
-        command: Command to execute
-        history: Current chat history
-
-    Returns:
-        Updated history, hidden welcome, visible chatbot
-    """
-    response = conversation_manager.process_message(command)
-    history.append((command, response))
-
-    return history, gr.update(visible=False), gr.update(visible=True)
-
-
 def create_app():
-    """Create and configure the Gradio application"""
+    """Create the Gradio application"""
 
-    with gr.Blocks(
-        css=get_custom_css(),
-        title=config.APP_TITLE
-    ) as app:
+    with gr.Blocks(css=get_custom_css(), title=config.APP_TITLE) as app:
 
-        # State for welcome visibility
+        # State
         chat_started = gr.State(False)
+        sidebar_visible = gr.State(True)
 
-        with gr.Row(equal_height=False):
+        with gr.Row(elem_classes="app-container"):
 
-            # ========================================
-            # LEFT SIDEBAR
-            # ========================================
-            with gr.Column(scale=0, min_width=260):
-
-                # Sidebar header
+            # ===================
+            # SIDEBAR
+            # ===================
+            with gr.Column(elem_classes="sidebar-column", visible=True) as sidebar:
                 gr.HTML("""
                     <div style="padding: 12px; margin-bottom: 8px;">
                         <div style="font-size: 16px; font-weight: 600; color: #ececf1;">
@@ -136,19 +67,21 @@ def create_app():
                     </div>
                 """)
 
-                # Navigation buttons
+                # Navigation
                 with gr.Column():
-                    skills_btn = gr.Button("🎯 Skills", size="lg")
-                    exp_btn = gr.Button("💼 Experience", size="lg")
-                    proj_btn = gr.Button("🚀 Projects", size="lg")
-                    edu_btn = gr.Button("🎓 Education", size="lg")
-                    contact_btn = gr.Button("📧 Contact", size="lg")
+                    skills_btn = gr.Button("🎯 Skills", elem_classes="nav-item")
+                    exp_btn = gr.Button(
+                        "💼 Experience", elem_classes="nav-item")
+                    proj_btn = gr.Button("🚀 Projects", elem_classes="nav-item")
+                    edu_btn = gr.Button("🎓 Education", elem_classes="nav-item")
+                    contact_btn = gr.Button(
+                        "📧 Contact", elem_classes="nav-item")
 
-                # Profile section at bottom
+                # Profile
                 gr.HTML("""
-                    <div style="margin-top: 200px; padding: 12px; border-top: 1px solid #3e3e3e;">
+                    <div class="profile-section">
                         <div style="display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: white;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; color: white;">
                                 SM
                             </div>
                             <div>
@@ -159,110 +92,185 @@ def create_app():
                     </div>
                 """)
 
-            # ========================================
-            # MAIN CHAT AREA
-            # ========================================
-            with gr.Column(scale=1):
+            # ===================
+            # MAIN CONTENT
+            # ===================
+            with gr.Column(elem_classes="main-content") as main:
+
+                # Toggle & Clear buttons (fixed position via CSS)
+                toggle_btn = gr.Button("☰", elem_classes="toggle-btn")
+                clear_btn = gr.Button("🗑️", elem_classes="clear-btn")
 
                 # Welcome screen
-                welcome = gr.HTML(create_welcome_message(), visible=True)
+                welcome = gr.HTML(
+                    create_welcome_html(),
+                    visible=True,
+                    elem_classes="welcome-screen"
+                )
 
-                # Chatbot
+                # Chatbot (initially hidden)
                 chatbot = gr.Chatbot(
                     value=[],
-                    height=600,
+                    height=None,  # Let it flex
                     show_label=False,
                     container=False,
                     visible=False,
+                    elem_classes="chatbot-wrapper",
+                    avatar_images=(None, None),
+                    bubble_full_width=True,
                     render_markdown=False,
-                    sanitize_html=False
+                    show_copy_button=False
                 )
 
                 # Input area
-                with gr.Column():
-                    with gr.Column():
+                with gr.Column(elem_classes="input-area"):
+                    with gr.Column(elem_classes="input-container"):
                         msg = gr.Textbox(
                             placeholder='Message Sarjak or type "/" for commands...',
                             show_label=False,
                             container=False,
                             lines=1,
-                            max_lines=8
+                            max_lines=6,
+                            scale=1
                         )
 
-                        # Hint text
                         gr.HTML("""
-                            <div style="text-align: center; font-size: 12px; color: #8e8ea0; margin-top: 12px;">
+                            <div class="hint-text">
                                 Try: 
-                                <span style="display: inline-block; background: #40414f; padding: 4px 8px; border-radius: 8px; font-size: 11px; margin: 0 4px; border: 1px solid #565869; font-family: monospace;">/projects</span>
-                                <span style="display: inline-block; background: #40414f; padding: 4px 8px; border-radius: 8px; font-size: 11px; margin: 0 4px; border: 1px solid #565869; font-family: monospace;">/experience</span>
-                                <span style="display: inline-block; background: #40414f; padding: 4px 8px; border-radius: 8px; font-size: 11px; margin: 0 4px; border: 1px solid #565869; font-family: monospace;">/skills</span>
+                                <span class="command-hint">/projects</span>
+                                <span class="command-hint">/experience</span>
+                                <span class="command-hint">/skills</span>
                                 or ask anything!
                             </div>
                         """)
 
-                # Event handlers
-                def on_message(message: str, history: List[Tuple[str, str]], is_started: bool):
-                    if message:
-                        new_history, cleared = handle_message(message, history)
-                        return new_history, cleared, gr.update(visible=False), gr.update(visible=True), True
-                    return history, message, gr.update(), gr.update(), is_started
+        # ===================
+        # EVENT HANDLERS
+        # ===================
 
-                msg.submit(
-                    on_message,
-                    [msg, chatbot, chat_started],
-                    [chatbot, msg, welcome, chatbot, chat_started]
+        def process_message(message: str, history: List, started: bool):
+            """Process user message"""
+            if not message or not message.strip():
+                return history, "", gr.update(), gr.update(), started
+
+            # Get response from RAG
+            response = conversation_manager.process_message(message.strip())
+
+            # Format with avatars
+            user_msg = f'<div class="message"><div class="avatar user-avatar">SM</div><div>{message}</div></div>'
+            bot_msg = f'<div class="message"><div class="avatar bot-avatar">🤖</div><div>{response}</div></div>'
+
+            history.append([user_msg, bot_msg])
+
+            return (
+                history,
+                "",
+                gr.update(visible=False),  # Hide welcome
+                gr.update(visible=True),   # Show chatbot
+                True
+            )
+
+        def clear_chat():
+            """Clear conversation"""
+            return (
+                [],
+                gr.update(visible=True),   # Show welcome
+                gr.update(visible=False),  # Hide chatbot
+                False
+            )
+
+        def toggle_sidebar(is_visible: bool):
+            """Toggle sidebar visibility"""
+            new_state = not is_visible
+            if new_state:
+                return (
+                    gr.update(elem_classes="sidebar-column"),
+                    gr.update(elem_classes="toggle-btn"),
+                    gr.update(elem_classes="main-content"),
+                    new_state
+                )
+            else:
+                return (
+                    gr.update(elem_classes="sidebar-column collapsed"),
+                    gr.update(elem_classes="toggle-btn sidebar-closed"),
+                    gr.update(elem_classes="main-content sidebar-closed"),
+                    new_state
                 )
 
-                # Sidebar button handlers
-                def on_sidebar_click(command: str):
-                    def handler(history: List[Tuple[str, str]], is_started: bool):
-                        new_history, welcome_update, chatbot_update = handle_sidebar_click(
-                            command, history)
-                        return new_history, welcome_update, chatbot_update, True
-                    return handler
+        def handle_command(command: str, history: List, started: bool):
+            """Handle sidebar button clicks"""
+            response = conversation_manager.process_message(command)
 
-                skills_btn.click(
-                    on_sidebar_click("/skills"),
-                    [chatbot, chat_started],
-                    [chatbot, welcome, chatbot, chat_started]
-                )
+            user_msg = f'<div class="message"><div class="avatar user-avatar">SM</div><div>{command}</div></div>'
+            bot_msg = f'<div class="message"><div class="avatar bot-avatar">🤖</div><div>{response}</div></div>'
 
-                exp_btn.click(
-                    on_sidebar_click("/experience"),
-                    [chatbot, chat_started],
-                    [chatbot, welcome, chatbot, chat_started]
-                )
+            history.append([user_msg, bot_msg])
 
-                proj_btn.click(
-                    on_sidebar_click("/projects"),
-                    [chatbot, chat_started],
-                    [chatbot, welcome, chatbot, chat_started]
-                )
+            return (
+                history,
+                gr.update(visible=False),
+                gr.update(visible=True),
+                True
+            )
 
-                edu_btn.click(
-                    on_sidebar_click("/education"),
-                    [chatbot, chat_started],
-                    [chatbot, welcome, chatbot, chat_started]
-                )
+        # Connect events
+        msg.submit(
+            process_message,
+            [msg, chatbot, chat_started],
+            [chatbot, msg, welcome, chatbot, chat_started]
+        )
 
-                contact_btn.click(
-                    on_sidebar_click("/contact"),
-                    [chatbot, chat_started],
-                    [chatbot, welcome, chatbot, chat_started]
-                )
+        clear_btn.click(
+            clear_chat,
+            [],
+            [chatbot, welcome, chatbot, chat_started]
+        )
+
+        toggle_btn.click(
+            toggle_sidebar,
+            [sidebar_visible],
+            [sidebar, toggle_btn, main, sidebar_visible]
+        )
+
+        # Sidebar buttons
+        skills_btn.click(
+            lambda h, s: handle_command("/skills", h, s),
+            [chatbot, chat_started],
+            [chatbot, welcome, chatbot, chat_started]
+        )
+
+        exp_btn.click(
+            lambda h, s: handle_command("/experience", h, s),
+            [chatbot, chat_started],
+            [chatbot, welcome, chatbot, chat_started]
+        )
+
+        proj_btn.click(
+            lambda h, s: handle_command("/projects", h, s),
+            [chatbot, chat_started],
+            [chatbot, welcome, chatbot, chat_started]
+        )
+
+        edu_btn.click(
+            lambda h, s: handle_command("/education", h, s),
+            [chatbot, chat_started],
+            [chatbot, welcome, chatbot, chat_started]
+        )
+
+        contact_btn.click(
+            lambda h, s: handle_command("/contact", h, s),
+            [chatbot, chat_started],
+            [chatbot, welcome, chatbot, chat_started]
+        )
 
     return app
 
 
 if __name__ == "__main__":
-    # Create and launch app
     demo = create_app()
-
-    # Get system stats
     stats = conversation_manager.get_stats()
     logger.info(f"System ready: {stats}")
 
-    # Launch
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
