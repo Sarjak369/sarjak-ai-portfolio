@@ -127,7 +127,7 @@ def create_app():
                 return history, "", gr.update(), gr.update()
 
             # Add user message immediately
-            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="flex:1;text-align:right;color:#ececf1;font-size:15px;line-height:1.6;">{message}</div><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(84,54,218,0.3);">👤</div></div></div>'
+            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="flex:1;text-align:left;color:#ececf1;font-size:15px;line-height:1.6;">{message}</div><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(84,54,218,0.3);">👤</div></div></div>'
 
             # Show typing indicator
             typing_msg = '<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;margin:2px 0;"><div style="max-width:70%;display:flex;gap:12px;align-items:flex-start;"><div style="width:32px;height:32px;min-width:32px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(16,163,127,0.3);">🤖</div><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>'
@@ -170,7 +170,7 @@ def create_app():
             """Handle sidebar button click"""
             response = conversation_manager.process_message(cmd)
 
-            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="flex:1;text-align:right;">{cmd}</div><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div></div></div>'
+            user_msg = f'<div style="display:flex;justify-content:flex-end;padding:16px 24px;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="flex:1;text-align:left;">{cmd}</div><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#5436DA;display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div></div></div>'
 
             bot_msg = f'<div style="display:flex;justify-content:flex-start;padding:16px 24px;background:#2f2f2f;"><div style="max-width:70%;display:flex;gap:10px;align-items:flex-start;"><div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;font-size:16px;">🤖</div><div style="flex:1;">{response}</div></div></div>'
 

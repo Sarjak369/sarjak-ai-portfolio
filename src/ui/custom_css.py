@@ -187,16 +187,21 @@ button.nav-item:active {
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
+    padding-bottom: 140px !important;
 }
 
 .main-content.sidebar-closed {
     margin-left: 0 !important;
 }
 
+.main-content.sidebar-closed ~ .input-area,
+.sidebar-closed ~ * .input-area {
+    left: 0 !important;
+}
+
 /* ===== WELCOME SCREEN ===== */
 .main-content > div:first-of-type {
     animation: fadeIn 0.5s ease-out !important;
-    flex: 1 !important;
     overflow-y: auto !important;
     padding-top: 80px !important;
 }
@@ -205,7 +210,6 @@ button.nav-item:active {
 .chatbot-wrapper {
     background: var(--bg-main) !important;
     border: none !important;
-    flex: 1 !important;
     overflow-y: auto !important;
     padding-top: 80px !important;
     padding-bottom: 0px !important;
@@ -257,13 +261,16 @@ button.nav-item:active {
 
 /* ===== INPUT AREA ===== */
 .input-area {
-    padding: 20px 24px 24px 24px !important;
+    padding: 16px 24px !important;
     background: var(--bg-main) !important;
     border-top: 1px solid var(--border-subtle) !important;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
-    position: sticky !important;
+    position: fixed !important;
     bottom: 0 !important;
+    left: 260px !important;
+    right: 0 !important;
     z-index: 10 !important;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .input-area textarea {
@@ -291,7 +298,8 @@ button.nav-item:active {
     text-align: center !important;
     font-size: 11px !important;
     color: var(--text-muted) !important;
-    margin-top: 10px !important;
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
     overflow: hidden !important;
     white-space: nowrap !important;
     animation: fadeIn 0.5s ease-out !important;
