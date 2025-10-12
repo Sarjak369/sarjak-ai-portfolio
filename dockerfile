@@ -1,33 +1,26 @@
-# ===== App image =====
+# ---- 1) Base
 FROM python:3.11-slim
 
-# System deps for pip/Chromadb/PyTorch-lite wheels etc.
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    TOKENIZERS_PARALLELISM=false
+
+# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential curl git && \
+    build-essential git curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Prevent HF tokenizers fork warning noise in containers
-ENV TOKENIZERS_PARALLELISM=false \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    GRADIO_SERVER_NAME=0.0.0.0
-
+# ---- 2) App
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
-# Copy source
+# Copy only what we need for runtime
 COPY . .
 
-# Default envs (override in platform)
-ENV LLM_PROVIDER=ollama \
-    OLLAMA_BASE_URL=http://ollama:11434 \
-    CHUNK_SIZE=850 \
-    CHUNK_OVERLAP=150 \
-    RAG_TOP_K=8
-
-# Expose Gradio
+# Gradio expects us to listen on 7860 in Spaces
+ENV PORT=7860
 EXPOSE 7860
 
-# Start the app
+# Important for HF Spaces: bind 0.0.0.0 and use PORT
 CMD ["python", "app.py"]
