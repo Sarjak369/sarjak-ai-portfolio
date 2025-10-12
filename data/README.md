@@ -17,7 +17,7 @@ This folder is **not** checked into source control (see `.gitignore`). Keep all 
 
    ```bash
    python test_rag.py --reset
-   ```
+
 4. Launch the app:
 
    ```bash
@@ -164,6 +164,7 @@ Examples:
   ```bash
   python test_rag.py --reset
   ```
+  
 * Private files in `data/` are ignored by Git. Only `data/README.md` and `data/schema/` are tracked.
 * If you clone this repo elsewhere, just recreate `data/` locally and drop your files in.
 
