@@ -39,10 +39,11 @@ logs/
 # Keep the data folder but ignore its contents by default.
 # Leave a small README so the folder exists in the repo.
 # ======================
-data/**
-!data/README.md
-# (Optionally keep schema/examples)
-!data/schema/**
+# --- keep all real data private ---
+/data/**
+!/data/schema/**
+!/data/README.md
+
 # Vector DB and caches
 chroma_db/
 .cache/

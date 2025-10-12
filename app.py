@@ -1,6 +1,7 @@
 """
 Sarjak's AI/ML Portfolio - ACTUALLY WORKING VERSION
 """
+import os
 import gradio as gr
 from typing import List
 from src.ui.custom_css import get_custom_css
@@ -362,9 +363,6 @@ if __name__ == "__main__":
     stats = conversation_manager.get_stats()
     logger.info(f"Ready: {stats}")
 
-    demo.launch(
-        server_name="0.0.0.0",
-        server_port=7860,
-        share=False,
-        show_error=True
-    )
+    port = int(os.getenv("PORT", "7860"))
+    demo.launch(server_name="0.0.0.0", server_port=port,
+                share=False, show_error=True)
