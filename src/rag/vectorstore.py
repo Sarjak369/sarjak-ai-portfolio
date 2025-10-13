@@ -4,11 +4,10 @@ ChromaDB vector store management with LangChain
 import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.schema import Document
-
+import os
 from src.utils.logger import logger
 import config
 
@@ -73,6 +72,9 @@ class VectorStoreManager:
                     shutil.rmtree(p)
                     logger.info(
                         "🧹 Removed existing Chroma directory for reset")
+                p.mkdir(parents=True, exist_ok=True)        # <— recreate!
+                # <— make sure writable
+                os.chmod(p, 0o755)
             except Exception as e:
                 logger.error(f"Failed to reset Chroma directory: {e}")
 
@@ -85,15 +87,10 @@ class VectorStoreManager:
             documents=lc_documents,
             embedding=self.embeddings,
             collection_name=self.collection_name,
-            persist_directory=self.persist_directory,
+            persist_directory=str(self.persist_directory),
         )
         # Persist to disk (works, though 0.4+ often auto-persists)
         assert self.vectorstore is not None
-        try:
-            self.vectorstore.persist()
-        except Exception:
-            # Safe to ignore if auto-persisting
-            pass
 
         logger.info(
             f"✅ Vector store created with {len(lc_documents)} documents")
@@ -118,10 +115,6 @@ class VectorStoreManager:
         assert self.vectorstore is not None
         try:
             self.vectorstore.add_documents(lc_documents)
-            try:
-                self.vectorstore.persist()
-            except Exception:
-                pass
             logger.info(
                 f"➕ Added {len(lc_documents)} documents to vector store")
         except Exception as e:

@@ -46,18 +46,7 @@ logs/
 
 # Vector DB and caches
 chroma_db/
-.cache/
-.checkpoints/
-gradio_cached_examples/
-
-# ======================
-# Notebooks & Scratch
-# ======================
-*.ipynb
-notebooks/
-tmp/
-temp/
-scratch/
+data/
 
 # ======================
 # Dev-only scripts
