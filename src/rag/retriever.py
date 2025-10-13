@@ -45,7 +45,7 @@ class RAGRetriever:
     def _build_vector_store(self):
         logger.info("Building vector store from data files...")
         documents = self.data_loader.get_all_documents()
-        self.vector_store.create_from_documents(documents, reset=True)
+        self.vector_store.create_from_documents(documents, reset=False)
         logger.info(f"✅ Vector store built: {self.vector_store.get_stats()}")
 
     # -------------------------------------------------------------------------

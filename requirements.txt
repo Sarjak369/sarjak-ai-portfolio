@@ -15,3 +15,5 @@ langchain_openai
 langchain_ollama
 python-dotenv
 langchain-huggingface
+PyPDF2
+langchain_chroma
