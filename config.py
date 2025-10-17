@@ -27,10 +27,8 @@ SKILLS_DATA = DATA_DIR / "skills.json"
 EXPERIENCE_DATA = DATA_DIR / "experience.json"
 PROJECTS_DATA = DATA_DIR / "projects.json"
 EDUCATION_DATA = DATA_DIR / "education.json"
-
-# Enriched context + external docs
 PROFILE_CONTEXT_DATA = DATA_DIR / "profile_context.json"
-DOCS_DIR = DATA_DIR / "docs"  # Put your PDFs/TXT/MD here
+DOCS_DIR = DATA_DIR / "docs"
 
 # -----------------------------------------------------------------------------
 # Vector database (Chroma)
@@ -40,32 +38,24 @@ COLLECTION_NAME = "sarjak_portfolio"
 
 # -----------------------------------------------------------------------------
 # LLM provider settings
-# Options: "openai" or "ollama"
+# Options: "openai" or "groq"
 # -----------------------------------------------------------------------------
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")  # switch provider here
 # LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")
 
-# OpenAI (kept for easy switching)
+# -----------------------------------------------------------------------------
+# OpenAI API (fallback)
+# -----------------------------------------------------------------------------
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.3"))
 
-# Ollama (FREE local)
-# Suggested models:
-
-# little heavy and will take more time
-# -> llama3.1:8b-instruct-q4_0
-
-# good quality/speed balance
-# -> ollama pull llama3.2:3b-instruct-q4_0
-
-# also fast + very capable on RAG (often better than 3B llama)
-# -> ollama pull qwen2.5:3b-instruct-q4_0
-
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct-q4_0")
-OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.2"))
-OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))   # context window
+# -----------------------------------------------------------------------------
+# Groq Cloud API
+# -----------------------------------------------------------------------------
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_TEMPERATURE = float(os.getenv("GROQ_TEMPERATURE", "0.3"))
 
 # -----------------------------------------------------------------------------
 # Embeddings
@@ -76,12 +66,8 @@ EMBEDDING_MODEL = os.getenv(
 # -----------------------------------------------------------------------------
 # RAG settings
 # -----------------------------------------------------------------------------
-# Larger K to improve recall; we apply a lightweight rerank later.
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "8"))
-# Accept a bit more up front; rerank/boosts will filter/weight.
 RAG_SCORE_THRESHOLD = float(os.getenv("RAG_SCORE_THRESHOLD", "0.35"))
-
-# Chunking tuned for general CV/portfolio content and PDFs
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "850"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
 
