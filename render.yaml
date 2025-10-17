@@ -3,7 +3,7 @@ services:
     name: sarjak-ai-portfolio
     runtime: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
+    startCommand: "python -u app.py"
     envVars:
       - key: LLM_PROVIDER
         value: groq

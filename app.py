@@ -9,9 +9,19 @@ from src.agent.conversation import ConversationManager
 from src.utils.logger import logger
 import config
 
-logger.info("Initializing portfolio...")
-conversation_manager = ConversationManager()
-logger.info("✅ Ready!")
+conversation_manager = None
+
+
+def get_manager():
+    """Create the ConversationManager on first use."""
+    global conversation_manager
+    if conversation_manager is None:
+        logger.info("Initializing portfolio (lazy)…")
+        from src.agent.conversation import ConversationManager
+        # NOTE: keep defaults; avoid heavy work until first call
+        conversation_manager = ConversationManager()
+        logger.info("✅ Portfolio initialized")
+    return conversation_manager
 
 
 def create_app():
@@ -195,7 +205,9 @@ def create_app():
             ]
 
             # Get response
-            response = conversation_manager.process_message(message.strip())
+            # response = conversation_manager.process_message(message.strip())
+            mgr = get_manager()
+            response = mgr.process_message(message.strip())
 
             # ===== BOT MESSAGE BUBBLE =====
             bot_msg = f'''
@@ -289,7 +301,9 @@ def create_app():
 
         def handle_command(cmd: str, history: List):
             """Handle sidebar button click"""
-            response = conversation_manager.process_message(cmd)
+            # response = conversation_manager.process_message(cmd)
+            mgr = get_manager()
+            response = mgr.process_message(cmd)
 
             user_msg = f'''
                 <div style="display:flex;justify-content:flex-end;padding:8px 20px;">
@@ -355,21 +369,26 @@ def create_app():
         contact_btn.click(lambda h: handle_command(
             "/contact", h), [chatbot], [chatbot, welcome, chatbot, scroll_exec])
 
+        def _warmup():
+            try:
+                get_manager()
+            except Exception as e:
+                logger.error(f"Warmup failed: {e}")
+        app.load(_warmup, queue=False)  # runs after Gradio has bound the port
+
     return app
 
 
 if __name__ == "__main__":
     demo = create_app()
-    stats = conversation_manager.get_stats()
-    logger.info(f"Ready: {stats}")
 
-    # Bind explicitly to Render's provided port
     port = int(os.getenv("PORT", "10000"))
-    logger.info(f"🚀 Starting server on port {port} ...")
+    logger.info(f"🚀 Starting server on 0.0.0.0:{port} ...")
 
-    demo.launch(
-        server_name="0.0.0.0",   # must bind to 0.0.0.0 for external access
-        server_port=port,        # must use PORT from env
+    # Optional queue; useful for back-pressure on Render
+    demo.queue(default_concurrency_limit=4).launch(
+        server_name="0.0.0.0",
+        server_port=port,
         share=False,
         show_error=True,
     )
