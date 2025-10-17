@@ -2,6 +2,8 @@
 Load and prepare data for RAG system
 """
 from __future__ import annotations
+import json
+import os
 
 import re
 from typing import List, Dict, Any
@@ -19,21 +21,55 @@ DOCS_DIR = getattr(config, "DOCS_DIR", None)
 SUPPORTED_EXTS = {".pdf", ".txt", ".md"}
 
 
+# ----------------------------------------------------
+# Helper: Load JSON from file or environment
+# ----------------------------------------------------
+
+def load_json_or_env(path: Path | str, env_key: str) -> dict:
+    """
+    Load JSON from local file if it exists, otherwise from environment variable.
+    """
+    # 1️⃣ Try local file (for local dev)
+    try:
+        if path and Path(path).exists():
+            from src.utils.helpers import load_json
+            return load_json(path)
+    except Exception:
+        pass
+
+    # 2️⃣ Try environment variable (for Render)
+    data = os.getenv(env_key)
+    if data:
+        try:
+            return json.loads(data)
+        except Exception as e:
+            logger.warning(f"Failed to parse {env_key}: {e}")
+
+    logger.warning(f"Missing {env_key} and file {path}")
+    return {}
+
+
 class DataLoader:
     """Load and structure portfolio data for RAG"""
 
     def __init__(self):
-        # Core JSON sources
-        self.profile: Dict[str, Any] = load_json(config.PROFILE_DATA)
-        self.skills: Dict[str, Any] = load_json(config.SKILLS_DATA)
-        self.experience: Dict[str, Any] = load_json(config.EXPERIENCE_DATA)
-        self.projects: Dict[str, Any] = load_json(config.PROJECTS_DATA)
-        self.education: Dict[str, Any] = load_json(config.EDUCATION_DATA)
+        # Core JSON sources (local or env)
+        self.profile: Dict[str, Any] = load_json_or_env(
+            config.PROFILE_DATA, "PROFILE_JSON")
+        self.skills: Dict[str, Any] = load_json_or_env(
+            config.SKILLS_DATA, "SKILLS_JSON")
+        self.experience: Dict[str, Any] = load_json_or_env(
+            config.EXPERIENCE_DATA, "EXPERIENCE_JSON")
+        self.projects: Dict[str, Any] = load_json_or_env(
+            config.PROJECTS_DATA, "PROJECTS_JSON")
+        self.education: Dict[str, Any] = load_json_or_env(
+            config.EDUCATION_DATA, "EDUCATION_JSON")
 
-        # Enriched profile context
-        self.profile_ctx: Dict[str, Any] = load_json(
+        # Enriched profile context (optional)
+        self.profile_ctx: Dict[str, Any] = load_json_or_env(
             getattr(config, "PROFILE_CONTEXT_DATA",
-                    config.DATA_DIR / "profile_context.json")
+                    config.DATA_DIR / "profile_context.json"),
+            "PROFILE_CONTEXT_JSON"
         )
 
         # Chunking parameters
