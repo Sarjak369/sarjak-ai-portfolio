@@ -35,7 +35,7 @@ DOCS_DIR = DATA_DIR / "docs"  # Put your PDFs/TXT/MD here
 # -----------------------------------------------------------------------------
 # Vector database (Chroma)
 # -----------------------------------------------------------------------------
-CHROMA_DB_DIR = BASE_DIR / "chroma_db"
+CHROMA_DB_DIR = os.path.expanduser("~/.sarjak_portfolio/chroma_db")
 COLLECTION_NAME = "sarjak_portfolio"
 
 # -----------------------------------------------------------------------------
