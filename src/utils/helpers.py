@@ -10,28 +10,27 @@ from src.utils.logger import logger
 
 def load_json(file_path: Union[str, Path]) -> Dict[str, Any]:
     """
-    Load JSON file
-
-    Args:
-        file_path: Path to JSON file (str or Path)
-
-    Returns:
-        Dictionary containing JSON data
+    Load JSON from disk if it exists. Missing files are normal in cloud
+    (we use env vars there), so just return {} without logging an error.
     """
-    try:
-        # Convert Path to str if needed
-        file_path_str = str(file_path) if isinstance(
-            file_path, Path) else file_path
+    p = Path(file_path)
 
-        with open(file_path_str, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        logger.info(f"Successfully loaded {file_path_str}")
-        return data
-    except FileNotFoundError:
-        logger.error(f"File not found: {file_path}")
+    # Missing is OK on Render; we'll use env vars via load_json_or_env
+    if not p.exists():
+        logger.debug(
+            f"JSON not found at {p} (expected on Render when using env).")
         return {}
+
+    try:
+        with p.open('r', encoding='utf-8') as f:
+            data = json.load(f)
+        logger.info(f"Successfully loaded {p}")
+        return data
     except json.JSONDecodeError as e:
-        logger.error(f"Error decoding JSON from {file_path}: {e}")
+        logger.warning(f"Error decoding JSON from {p}: {e}")
+        return {}
+    except Exception as e:
+        logger.warning(f"Failed to read JSON {p}: {e}")
         return {}
 
 

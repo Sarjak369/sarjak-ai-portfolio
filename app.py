@@ -363,13 +363,13 @@ if __name__ == "__main__":
     stats = conversation_manager.get_stats()
     logger.info(f"Ready: {stats}")
 
-    # Use Render-provided PORT or fallback to 7860
-    port = int(os.getenv("PORT", 7860))
+    # Bind explicitly to Render's provided port
+    port = int(os.getenv("PORT", "10000"))
+    logger.info(f"🚀 Starting server on port {port} ...")
 
-    # Important for Render: must bind to 0.0.0.0 and not use share=True
     demo.launch(
-        server_name="0.0.0.0",
-        server_port=port,
+        server_name="0.0.0.0",   # must bind to 0.0.0.0 for external access
+        server_port=port,        # must use PORT from env
         share=False,
         show_error=True,
     )
