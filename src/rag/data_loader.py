@@ -27,25 +27,35 @@ SUPPORTED_EXTS = {".pdf", ".txt", ".md"}
 
 def load_json_or_env(path: Path | str, env_key: str) -> dict:
     """
-    Load JSON from local file if it exists, otherwise from environment variable.
+    Load JSON from local file (for local dev), 
+    or from environment variable (for Render deploy).
     """
-    # 1️⃣ Try local file (for local dev)
+    # 1) Try local file first (for local dev)
     try:
         if path and Path(path).exists():
             from src.utils.helpers import load_json
+            logger.info(f"Loading local file: {path}")
             return load_json(path)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Local file load failed for {path}: {e}")
 
-    # 2️⃣ Try environment variable (for Render)
+    # 2) Try environment variable (for Render)
     data = os.getenv(env_key)
     if data:
         try:
-            return json.loads(data)
+            # Clean up extra whitespace or escape sequences
+            data = data.strip()
+            # Handle JSONs pasted with escaped newlines or quotes
+            if data.startswith('"') and data.endswith('"'):
+                data = json.loads(data)
+            result = json.loads(data)
+            logger.info(f"Loaded {env_key} from environment variable")
+            return result
         except Exception as e:
-            logger.warning(f"Failed to parse {env_key}: {e}")
+            logger.error(f"❌ Failed to parse {env_key} from env: {e}")
 
-    logger.warning(f"Missing {env_key} and file {path}")
+    # 3️⃣ If both fail, return empty dict
+    logger.warning(f"⚠️ Missing {env_key} and file {path}")
     return {}
 
 
@@ -53,24 +63,18 @@ class DataLoader:
     """Load and structure portfolio data for RAG"""
 
     def __init__(self):
-        # Core JSON sources (local or env)
-        self.profile: Dict[str, Any] = load_json_or_env(
-            config.PROFILE_DATA, "PROFILE_JSON")
-        self.skills: Dict[str, Any] = load_json_or_env(
-            config.SKILLS_DATA, "SKILLS_JSON")
-        self.experience: Dict[str, Any] = load_json_or_env(
-            config.EXPERIENCE_DATA, "EXPERIENCE_JSON")
-        self.projects: Dict[str, Any] = load_json_or_env(
-            config.PROJECTS_DATA, "PROJECTS_JSON")
-        self.education: Dict[str, Any] = load_json_or_env(
-            config.EDUCATION_DATA, "EDUCATION_JSON")
-
-        # Enriched profile context (optional)
-        self.profile_ctx: Dict[str, Any] = load_json_or_env(
-            getattr(config, "PROFILE_CONTEXT_DATA",
-                    config.DATA_DIR / "profile_context.json"),
-            "PROFILE_CONTEXT_JSON"
-        )
+        self.profile = load_json_or_env(
+            config.DATA_DIR / "profile.json", "PROFILE_JSON")
+        self.skills = load_json_or_env(
+            config.DATA_DIR / "skills.json", "SKILLS_JSON")
+        self.experience = load_json_or_env(
+            config.DATA_DIR / "experience.json", "EXPERIENCE_JSON")
+        self.projects = load_json_or_env(
+            config.DATA_DIR / "projects.json", "PROJECTS_JSON")
+        self.education = load_json_or_env(
+            config.DATA_DIR / "education.json", "EDUCATION_JSON")
+        self.profile_ctx = load_json_or_env(
+            config.DATA_DIR / "profile_context.json", "PROFILE_CONTEXT_JSON")
 
         # Chunking parameters
         self.chunk_size: int = getattr(config, "CHUNK_SIZE", 900)
