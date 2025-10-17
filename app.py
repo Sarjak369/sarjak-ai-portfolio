@@ -363,6 +363,10 @@ if __name__ == "__main__":
     stats = conversation_manager.get_stats()
     logger.info(f"Ready: {stats}")
 
-    port = int(os.getenv("PORT", "7860"))
-    demo.launch(server_name="0.0.0.0", server_port=port,
-                share=False, show_error=True)
+    port = int(os.environ.get("PORT", 7860))  # Render assigns dynamic port
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=port,
+        share=False,
+        show_error=True,
+    )

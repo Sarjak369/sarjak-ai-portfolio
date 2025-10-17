@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sarjak-ai-portfolio
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: LLM_PROVIDER
+        value: groq
+      - key: PORT
+        value: 7860
