@@ -1,10 +1,10 @@
 """
-RAG retrieval system using LangChain
+RAG retrieval system optimized for Render free tier
 """
 import re
 from typing import List, Dict, Any, Optional, Tuple
 from collections import Counter
-
+from sentence_transformers import SentenceTransformer  # lightweight embedder
 from src.rag.data_loader import DataLoader
 from src.rag.vectorstore import VectorStoreManager
 from src.llm.model import LLMInterface
@@ -16,37 +16,43 @@ SENSITIVE_TERMS = [kw.lower() for kw in config.SENSITIVE_KEYWORDS]
 
 
 class RAGRetriever:
-    """LangChain-based RAG system for intelligent query answering"""
+    """Optimized RAG system for low-memory environments (e.g., Render Free Tier)."""
+
+    # Singleton cached model (only loads once per container)
+    _embedding_model = None
 
     def __init__(self, reset_db: bool = False, llm_provider: Optional[str] = None):
-        logger.info("Initializing LangChain RAG system...")
+        logger.info("Initializing LangChain RAG system (optimized)...")
         self.data_loader = DataLoader()
         self.vector_store = VectorStoreManager()
         self.llm = LLMInterface(provider=llm_provider)
 
-        if reset_db:
-            self._build_vector_store()
-        else:
-            try:
-                self.vector_store.load_existing()
-                stats = self.vector_store.get_stats()
-                if stats.get("document_count", 0) == 0:
-                    logger.info("Vector store empty, building...")
-                    self._build_vector_store()
-            except Exception as e:
-                logger.info(f"Building new vector store: {e}")
-                self._build_vector_store()
+        # Defer embedding model load until first query
+        self.embedding_model = None
 
-        logger.info("✅ LangChain RAG system ready!")
+        # Vector store init — no heavy rebuild on startup
+        try:
+            self.vector_store.load_existing()
+        except Exception as e:
+            logger.warning(
+                f"Vector store load failed: {e}. Building new one...")
+            self._build_vector_store()
+
+        logger.info("✅ LangChain RAG system ready (lightweight mode).")
 
     # -------------------------------------------------------------------------
     # Build / Load
     # -------------------------------------------------------------------------
+
     def _build_vector_store(self):
         logger.info("Building vector store from data files...")
-        documents = self.data_loader.get_all_documents()
-        self.vector_store.create_from_documents(documents, reset=False)
-        logger.info(f"✅ Vector store built: {self.vector_store.get_stats()}")
+        try:
+            documents = self.data_loader.get_all_documents()
+            self.vector_store.create_from_documents(documents, reset=False)
+            logger.info(
+                f"✅ Vector store built: {self.vector_store.get_stats()}")
+        except Exception as e:
+            logger.error(f"❌ Failed to build vector store: {e}")
 
     # -------------------------------------------------------------------------
     # Guardrails
@@ -187,6 +193,19 @@ class RAGRetriever:
 
     def answer_query(self, query: str) -> str:
         logger.info(f"Processing query: {query}")
+
+        # Lazy-load model on first query
+        if self.embedding_model is None:
+            try:
+                logger.info("🧠 Loading embedding model on first query...")
+                from sentence_transformers import SentenceTransformer
+                self.embedding_model = SentenceTransformer(
+                    "sentence-transformers/paraphrase-MiniLM-L3-v2")
+                RAGRetriever._embedding_model = self.embedding_model
+                logger.info("✅ Model loaded and cached successfully.")
+            except Exception as e:
+                logger.error(f"⚠️ Failed to load model: {e}")
+                return "Sorry, my AI model is initializing — please retry in a few seconds."
 
         # 1) Guardrails
         if self._is_sensitive_query(query):

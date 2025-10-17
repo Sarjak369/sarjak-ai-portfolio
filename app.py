@@ -385,8 +385,24 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
     logger.info(f"🚀 Starting server on 0.0.0.0:{port} ...")
 
+    # Background preload thread for Render cold starts
+    import threading
+    from src.agent.conversation import ConversationManager
+
+    def preload_model():
+        try:
+            logger.info("⚙️ Preloading ConversationManager and RAG model...")
+            ConversationManager()  # triggers lazy model load only once (cached globally)
+            logger.info(
+                "✅ Model preloaded successfully (Render warm start ready)")
+        except Exception as e:
+            logger.warning(f"Preload failed: {e}")
+
+    # Start preload in background thread (non-blocking)
+    threading.Thread(target=preload_model, daemon=True).start()
+
     # Optional queue; useful for back-pressure on Render
-    demo.queue(default_concurrency_limit=4).launch(
+    demo.queue(default_concurrency_limit=2).launch(
         server_name="0.0.0.0",
         server_port=port,
         share=False,
