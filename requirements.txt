@@ -1,0 +1,54 @@
+# Core Framework
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Gradio UI
+gradio
+
+# LangChain & AI
+langchain
+langchain-community
+langchain-groq
+langchain-qdrant
+
+# Vector DB & Embeddings
+qdrant-client
+sentence-transformers
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Caching
+redis
+hiredis
+
+# PDF Processing
+pypdf
+pypdf2
+pdfplumber
+
+# Utilities
+python-dotenv
+pydantic
+pydantic-settings
+
+# HTTP & Async
+httpx
+aiohttp
+
+# Email validation
+email-validator
+
+# Monitoring & Logging
+loguru
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+
+# Type hints
+typing-extensions
