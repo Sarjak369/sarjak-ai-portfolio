@@ -45,15 +45,8 @@ env/
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-*.sqlite3
-
-# Logs
-*.log
-
 # ==========================================
-# PERSONAL DATA 
+# PERSONAL DATA - DO NOT COMMIT
 # ==========================================
 
 # Database with user data
@@ -66,10 +59,17 @@ qdrant_storage/
 chroma_db/
 faiss_index/
 
-# Any personal documents/files
+# User uploaded documents
+data/uploads/
 data/documents/
-data/knowledge_base/
-data/cache
+
+# Personal knowledge base content (keep templates only)
+data/knowledge_base/*.md
+!data/knowledge_base/README.md
+
+# Personal files in documents folder
+data/documents/*.pdf
+data/documents/*.docx
 
 # ==========================================
 # LOGS & CACHE
@@ -83,7 +83,6 @@ __pycache__/
 temp/
 tmp/
 
-
 # ==========================================
 # JUPYTER & NOTEBOOKS
 # ==========================================
@@ -96,7 +95,6 @@ tmp/
 .railway/
 .vercel/
 .netlify/
-
 
 # ==========================================
 # API KEYS & SECRETS
