@@ -63,7 +63,7 @@ faiss_index/
 data/uploads/
 data/documents/
 
-# Personal knowledge base content (keep templates only)
+# Personal knowledge base content - IGNORE INDIVIDUAL FILES, NOT FOLDER
 data/knowledge_base/*.md
 !data/knowledge_base/README.md
 
