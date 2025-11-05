@@ -27,10 +27,12 @@ wheels/
 venv/
 ENV/
 env/
+.venv/
 
 # Environment variables
 .env
 .env.local
+.env.production
 
 # IDE
 .vscode/
@@ -50,21 +52,63 @@ Thumbs.db
 # Logs
 *.log
 
-# Qdrant
-qdrant_storage/
+# ==========================================
+# PERSONAL DATA 
+# ==========================================
 
-# Cache
+# Database with user data
+*.db
+*.sqlite3
+data/cache/
+
+# Vector store with embeddings
+qdrant_storage/
+chroma_db/
+faiss_index/
+
+# Any personal documents/files
+data/documents/
+data/knowledge_base/
+data/cache
+
+# ==========================================
+# LOGS & CACHE
+# ==========================================
+*.log
+logs/
 __pycache__/
 .pytest_cache/
 .cache/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Temporary files
 *.tmp
 temp/
 tmp/
 
-# Railway
+
+# ==========================================
+# JUPYTER & NOTEBOOKS
+# ==========================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ==========================================
+# DEPLOYMENT
+# ==========================================
 .railway/
+.vercel/
+.netlify/
+
+
+# ==========================================
+# API KEYS & SECRETS
+# ==========================================
+secrets.yaml
+credentials.json
+*.pem
+*.key
+
+# ==========================================
+# BACKUP FILES
+# ==========================================
+*.bak
+*.backup
+*~
